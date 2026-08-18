@@ -1,0 +1,17 @@
+node_modules/
+lib/
+coverage/
+*.tgz
+
+# Local environment and tooling
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+.idea/
+.vscode/
+
+# Package-manager and test artifacts
+.pnpm-debug.log*
+.vitest/
