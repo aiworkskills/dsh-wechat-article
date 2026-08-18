@@ -1,0 +1,8 @@
+- insert:
+    - id: aws-wechat-article
+      name: '@aiworkskills/aws-wechat-article'
+      config:
+        pythonCommand: python3
+        maxDocumentBytes: 1048576
+        maxResults: 50
+        configurationUrl: https://aiworkskills.cn/config
