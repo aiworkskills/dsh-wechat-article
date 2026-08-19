@@ -35,7 +35,7 @@ export function ProjectWorkspace({ view, sessionId, onReferenceFile }: Props) {
     return <main className={css.content}><div className={css.operationError}>{load.message}</div><Button variant="toolbar" onClick={() => { void refresh() }}>重新读取</Button></main>
   }
   if (view === 'create') {
-    return <ArticleBrowser snapshot={snapshot!} sessionId={sessionId} onReferenceFile={onReferenceFile} refresh={() => { void refresh() }} />
+    return <ArticleBrowser snapshot={snapshot!} sessionId={sessionId} onReferenceFile={onReferenceFile} />
   }
   return <MaterialsBrowser snapshot={snapshot!} sessionId={sessionId} busy={mutationBusy} error={mutationError} onCreateCategory={createCategory} onRenameCategory={renameCategory} onRenameDocument={renameDocument} onRenameImage={renameImage} onDeleteDocument={deleteDocument} onDeleteImage={deleteImage} onUploadFiles={uploadMaterialFiles} />
 }
