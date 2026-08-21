@@ -20,13 +20,13 @@
 
 它不是另一套公众号写作方法，而是把开源项目 [wechat-article-skills](https://github.com/aiworkskills/wechat-article-skills) 接入 DeepSeek Harness。文章如何选题、写作、审稿、排版、配图和发布，仍然由原版 Skill 决定。
 
-> 当前版本是社区预览版，适配 DeepSeek Harness `0.1.0-rc.5`。
+> 当前版本是社区预览版，适配 DeepSeek Harness `0.1.1-rc.2`。
 
 ## 怎么安装
 
 当前版本需要从源码安装。安装前请准备：
 
-- DeepSeek Harness `0.1.0-rc.5`
+- DeepSeek Harness `0.1.1-rc.2`
 - Node.js `22.19`，或者 Node.js 24 及更高版本
 - pnpm 11
 - git

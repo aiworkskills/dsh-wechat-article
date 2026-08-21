@@ -1,6 +1,6 @@
-import { clientBundle } from '../../deepseek-harness/packages/client/tsdown.client.ts'
+import { outOfTreeClientBundle } from './build/harness-tsdown-patch.ts'
 
-export default clientBundle('@aiworkskills/aws-wechat-article', [
+export default outOfTreeClientBundle('@aiworkskills/aws-wechat-article', [
     'src/index.ts',
     'src/contracts.ts',
     'src/skills.ts',

@@ -17,6 +17,7 @@ describe('wechat commands', () => {
       commandId: CommandId('test-command'),
       agent,
       rawInput: '',
+      attachments: [],
       signal: new AbortController().signal,
     })
     expect(result).toEqual({ kind: 'success', text: 'https://aiworkskills.cn/config' })
