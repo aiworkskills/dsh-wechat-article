@@ -18,15 +18,19 @@ import { readFileSync } from 'node:fs'
 import { isBuiltin } from 'node:module'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+// `.harness` 是 scripts/link-harness.mjs 建立的符号链接,指向一份 Harness 源码
+// 检出(位置可由 DSH_SOURCE_ROOT 指定,缺省沿用原来的 ../../deepseek-harness)。
+// 这里通过固定链接名而非相对路径引用,构建才不再依赖仓库被摆在特定目录下;
+// 用符号链接而不是动态 import,是为了保留下面几个类型推导所需的静态类型。
 import {
   clientBundle,
   INLINE_SAFE,
   requestedExternals,
-} from '../../../deepseek-harness/packages/client/tsdown.client.ts'
+} from '../.harness/packages/client/tsdown.client.ts'
 import {
   PLATFORM_MODULES,
   PRELOADED_CLIENT_EXTERNALS,
-} from '../../../deepseek-harness/packages/client/web/src/platform.ts'
+} from '../.harness/packages/client/web/src/platform.ts'
 
 /**
  * Config types derived from the preset itself: the Harness repository pins its

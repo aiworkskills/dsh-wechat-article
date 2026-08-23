@@ -15,3 +15,7 @@ coverage/
 # Package-manager and test artifacts
 .pnpm-debug.log*
 .vitest/
+.harness
+
+# 运行测试时产生的会话存储
+.sessions/
