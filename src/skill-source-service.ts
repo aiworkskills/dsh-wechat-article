@@ -32,17 +32,21 @@ export class WechatSkillSource extends Service {
   private operation: 'installing' | 'updating' | undefined
   private providerMounted = false
 
+  private readonly sourceDir: string
+
   constructor(
     ctx: Context,
     private readonly gitCommand: string,
     private readonly mountProvider: () => Promise<void>,
+    skillSourceDir?: string,
   ) {
     super(ctx, 'wechatSkillSource')
+    this.sourceDir = resolveSkillSourceDir(skillSourceDir)
   }
 
   async status(): Promise<SkillSourceStatus> {
     if (this.operation !== undefined) return this.result(this.operation, [])
-    const sourceDir = resolveSkillSourceDir()
+    const sourceDir = this.sourceDir
     if (!await exists(sourceDir)) return this.result('missing', [])
     try {
       await validateSkillSource(sourceDir)
@@ -88,7 +92,7 @@ export class WechatSkillSource extends Service {
   }
 
   private async clone(): Promise<void> {
-    const sourceDir = resolveSkillSourceDir()
+    const sourceDir = this.sourceDir
     const parent = dirname(sourceDir)
     await mkdir(parent, { recursive: true })
     const staging = await mkdtemp(`${parent}/.${basename(sourceDir)}-`)
@@ -132,7 +136,7 @@ export class WechatSkillSource extends Service {
   }
 
   private async update(): Promise<void> {
-    const sourceDir = resolveSkillSourceDir()
+    const sourceDir = this.sourceDir
     const executable = await this.ctx.subprocess.resolveExecutable(this.gitCommand)
     await this.runGit(executable, sourceDir, [
       'fetch',

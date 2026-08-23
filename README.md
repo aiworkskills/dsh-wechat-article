@@ -77,6 +77,25 @@ DSH_SOURCE_ROOT=/path/to/deepseek-harness pnpm build
 容器构建、CI 以及把插件放进自有工作区的情况都适用。路径无效时构建会直接说明缺少什么，
 而不是抛出一串类型错误。
 
+### 使用预置的 Skill 检出
+
+默认情况下，公众号 Skill 由插件 `git clone` 到 DSH_HOME 下，每个 DSH_HOME 各持一份。
+单机单用户时这样最省事。
+
+托管部署不适用这个默认值：那里每个用户都有独立的 DSH_HOME，于是每来一个新用户就要
+重新 clone 一次 GitHub —— 既要求运行环境能访问外网，也让不同用户可能拿到不同版本的
+Skill。这类部署预置一份共享检出，并用 `skillSourceDir` 指向它：
+
+```yaml
+- id: aws-wechat-article
+  name: '@aiworkskills/aws-wechat-article'
+  config:
+    skillSourceDir: /opt/wechat-article-skills
+```
+
+Skill 版本随之固定，启动不再依赖网络。内网隔离环境、企业代理后，以及需要锁定 Skill
+版本的场景同理。目录需要是一份完整的 Git 检出（保留 `.git`，「更新 Skill」才可用）。
+
 ## 怎么使用
 
 ### 1. 打开一个公众号项目

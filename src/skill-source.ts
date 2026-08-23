@@ -17,7 +17,21 @@ export const WECHAT_SKILL_NAMES = [
   'aws-wechat-sticker',
 ] as const
 
-export function resolveSkillSourceDir(): string {
+/**
+ * 公众号 Skill 检出所在目录。
+ *
+ * 默认落在 DSH_HOME 下，每个 DSH_HOME 各自持有一份，由插件按需 git clone。
+ * 单机单用户时这样最省事。
+ *
+ * 托管部署不适用这个默认值：那里每个用户都有独立的 DSH_HOME，于是每来一个新用户
+ * 就要重新 clone 一次 GitHub —— 既要求运行环境能访问外网，也让不同用户可能拿到
+ * 不同版本的 Skill。这类部署应当预置一份共享检出并用 `override` 指向它，Skill
+ * 版本随镜像固定，启动不依赖网络。内网隔离、企业代理后，以及需要锁定 Skill 版本
+ * 的场景同理。
+ */
+export function resolveSkillSourceDir(override?: string): string {
+  const configured = override?.trim()
+  if (configured !== undefined && configured.length > 0) return configured
   return join(resolveDshHome(), 'sources', 'aiworkskills', 'wechat-article-skills')
 }
 

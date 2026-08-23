@@ -14,6 +14,8 @@ export interface Config {
   readonly maxDocumentBytes?: number
   readonly maxResults?: number
   readonly configurationUrl?: string
+  /** 预置的 Skill 检出目录；留空则用 DSH_HOME 下的默认位置并按需 clone。 */
+  readonly skillSourceDir?: string
 }
 
 export const Config: z<Config> = z.object({
@@ -22,6 +24,7 @@ export const Config: z<Config> = z.object({
   maxDocumentBytes: z.number().default(1_048_576),
   maxResults: z.number().default(50),
   configurationUrl: z.string().default('https://aiworkskills.cn/config'),
+  skillSourceDir: z.string().default(''),
 })
 
 export const name = 'aws-wechat-article'
@@ -34,13 +37,15 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
   const maxDocumentBytes = config.maxDocumentBytes ?? 1_048_576
   const maxResults = config.maxResults ?? 50
   const configurationUrl = config.configurationUrl ?? 'https://aiworkskills.cn/config'
+  const skillSourceDir = config.skillSourceDir ?? ''
   new WechatProductLibrary(ctx, {
     pythonCommand,
     maxDocumentBytes,
     maxResults,
+    skillSourceDir,
   })
-  new WechatArticleConfiguration(ctx, { pythonCommand })
-  await registerSkills(ctx, { gitCommand })
+  new WechatArticleConfiguration(ctx, { pythonCommand, skillSourceDir })
+  await registerSkills(ctx, { gitCommand, skillSourceDir })
   registerRoutes(ctx)
   registerTools(ctx)
   registerCommands(ctx, { configurationUrl })

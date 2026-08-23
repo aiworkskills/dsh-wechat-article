@@ -24,10 +24,13 @@ const GLOBAL_FIELDS = [
 /** Deployment configuration for the canonical Skill validator. */
 export interface Config {
   readonly pythonCommand?: string
+  /** 预置的 Skill 检出目录；留空则用 DSH_HOME 下的默认位置。 */
+  readonly skillSourceDir?: string
 }
 
 export const Config: z<Config> = z.object({
   pythonCommand: z.string().default('python3'),
+  skillSourceDir: z.string().default(''),
 })
 
 function workspacePath(workspace: string): string {
@@ -72,12 +75,14 @@ export class WechatArticleConfiguration extends Service {
 
   private readonly pythonCommand: string
   private readonly validateScript: string
+  private readonly sourceDir: string
 
   constructor(ctx: Context, config: Config = {}) {
     super(ctx, 'wechatArticleConfiguration')
     this.pythonCommand = config.pythonCommand ?? 'python3'
+    this.sourceDir = resolveSkillSourceDir(config.skillSourceDir)
     this.validateScript = skillScript(
-      resolveSkillSourceDir(),
+      this.sourceDir,
       'aws-wechat-article-main',
       'validate_env.py',
     )
@@ -87,7 +92,7 @@ export class WechatArticleConfiguration extends Service {
   async check(workspace: string, signal?: AbortSignal): Promise<ConfigurationStatus> {
     const root = workspacePath(workspace)
     try {
-      await validateSkillSource(resolveSkillSourceDir())
+      await validateSkillSource(this.sourceDir)
     } catch {
       return { state: 'missing', ready: false, issues: ['尚未安装公众号 Skill'] }
     }

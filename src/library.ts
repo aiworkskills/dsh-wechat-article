@@ -12,12 +12,15 @@ export interface Config {
   readonly pythonCommand?: string
   readonly maxDocumentBytes?: number
   readonly maxResults?: number
+  /** 预置的 Skill 检出目录；留空则用 DSH_HOME 下的默认位置。 */
+  readonly skillSourceDir?: string
 }
 
 export const Config: z<Config> = z.object({
   pythonCommand: z.string().default('python3'),
   maxDocumentBytes: z.number().default(1_048_576),
   maxResults: z.number().default(50),
+  skillSourceDir: z.string().default(''),
 })
 
 export type {
@@ -76,7 +79,7 @@ export class WechatProductLibrary extends Service {
     const maxResults = config.maxResults ?? 50
     this.limits = { maxDocumentBytes, maxResults }
     this.ingestScript = skillScript(
-      resolveSkillSourceDir(),
+      resolveSkillSourceDir(config.skillSourceDir),
       'aws-wechat-article-assets',
       'product_image_ingest.py',
     )
