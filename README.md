@@ -108,6 +108,9 @@ Skill 版本随之固定，启动不再依赖网络。内网隔离环境、企�
 
 第一次打开时，点击“安装公众号写作 Skill”。
 
+> 配置了 [`skillSourceDir`](#使用预置的-skill-检出) 的部署不会看到这一步：Skill 已经就位，
+> 右上角直接显示“更新 Skill”。
+
 插件会从 GitHub 安装 [aiworkskills/wechat-article-skills](https://github.com/aiworkskills/wechat-article-skills)。安装只需要完成一次，以后右上角会显示“更新 Skill”。
 
 ![安装公众号写作 Skill](docs/安装公众号运营skill.png)
