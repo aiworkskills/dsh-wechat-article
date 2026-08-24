@@ -63,6 +63,27 @@ pnpm dsh web --port 3081
 
 打开 `http://127.0.0.1:3081/`。安装成功后，左侧栏底部会出现“公众号”，插件管理页中只会显示一个插件：`aws-wechat-article`。
 
+### 插件加载在 Host 平面，不是 Agent Preset
+
+上面的 `dsh plugin add` 会把插件写进 profile 的 `bundles`，也就是 Host 组合——这是它
+唯一能工作的位置。托管部署自己拼装 profile 时同理，在 `cordis.patch.yml` 里 `insert`：
+
+```yaml
+- insert:
+    - id: aws-wechat-article
+      name: '@aiworkskills/aws-wechat-article'
+```
+
+**不要写进 Agent Preset 的 `agent.cordis.yml`。** 插件注册的是进程级 Cordis 服务
+（`wechatArticleConfiguration`、`wechatProductLibrary`、`wechatSkillSource`），Harness
+会拒绝挂载并报：
+
+```
+preset service must sit behind an `isolate` realm or move to the host composition
+```
+
+这条报错不会指出该放哪，照着「装插件」的直觉放进 Preset 很容易撞上。
+
 ### 换一个目录布局
 
 上面的命令把两个仓库放在固定位置，是为了让复制粘贴就能跑通。这个布局不是必须的。
