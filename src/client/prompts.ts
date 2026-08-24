@@ -22,20 +22,29 @@ function clean(value: string): string {
   return value.trim()
 }
 
-function configurationUrl(input: string): string {
+/**
+ * A package may only come from the configuration site this deployment is set up
+ * with, not from a host baked in here.
+ *
+ * The hardcoded hostname rejected every self-hosted configuration site: the
+ * import refused, naming a domain the operator had never configured. `siteUrl`
+ * is the deployment's own `configurationUrl` — that host and its subdomains.
+ */
+function configurationUrl(input: string, siteUrl: string): string {
   const candidate = clean(input).match(/https:\/\/[^\s"'<>]+/u)?.[0]
     ?.replace(/[。，；、）》】]+$/u, '')
-  if (candidate === undefined) throw new Error('请粘贴网站生成的 .aws 配置链接或完整配置指令')
+  if (candidate === undefined) throw new Error('请粘贴配置站生成的 .aws 配置链接或完整配置指令')
   const url = new URL(candidate)
-  const allowedHost = url.hostname === 'aiworkskills.cn' || url.hostname.endsWith('.aiworkskills.cn')
+  const site = new URL(siteUrl).hostname
+  const allowedHost = url.hostname === site || url.hostname.endsWith(`.${site}`)
   if (!allowedHost || !url.pathname.toLowerCase().endsWith('.aws')) {
-    throw new Error('只接受 aiworkskills.cn 生成的 HTTPS .aws 配置链接')
+    throw new Error(`只接受 ${site} 生成的 HTTPS .aws 配置链接`)
   }
   return url.href
 }
 
-export function configurationImportPrompt(input: string): string {
-  const url = configurationUrl(input)
+export function configurationImportPrompt(input: string, siteUrl: string): string {
+  const url = configurationUrl(input, siteUrl)
   return `/aws-wechat-article-assets 请导入这份微信公众号配置包：${url}\n导入完成后，请使用 aws-wechat-article-main 的原始 validate_env.py 校验当前项目，并完成首次预设目录初始化。校验通过前不要开始选题或创作。`
 }
 

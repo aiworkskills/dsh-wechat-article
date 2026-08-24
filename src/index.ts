@@ -46,7 +46,7 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
   })
   new WechatArticleConfiguration(ctx, { pythonCommand, skillSourceDir })
   await registerSkills(ctx, { gitCommand, skillSourceDir })
-  registerRoutes(ctx)
+  registerRoutes(ctx, { configurationUrl })
   registerTools(ctx)
   registerCommands(ctx, { configurationUrl })
 }

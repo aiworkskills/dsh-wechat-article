@@ -21,11 +21,24 @@ describe('wechat workbench prompts', () => {
     ])
   })
 
-  it('accepts only deployed aiworkskills .aws configuration links', () => {
-    expect(configurationImportPrompt('请导入：https://aiworkskills.cn/download/account.aws'))
+  it('accepts only .aws links from the configured site', () => {
+    const site = 'https://aiworkskills.cn/config'
+    expect(configurationImportPrompt('请导入：https://aiworkskills.cn/download/account.aws', site))
       .toContain('原始 validate_env.py 校验当前项目')
-    expect(() => configurationImportPrompt('https://example.com/account.aws')).toThrow('只接受')
-    expect(() => configurationImportPrompt('https://aiworkskills.cn/config')).toThrow('只接受')
+    // Subdomains of the configured host count; unrelated hosts do not.
+    expect(configurationImportPrompt('https://cdn.aiworkskills.cn/a.aws', site)).toContain('请导入这份')
+    expect(() => configurationImportPrompt('https://example.com/account.aws', site)).toThrow('只接受')
+    expect(() => configurationImportPrompt('https://aiworkskills.cn/config', site)).toThrow('只接受')
+  })
+
+  it('follows the deployment to a self-hosted configuration site', () => {
+    // The allowlist used to be a constant, so a self-hosted site could never
+    // import anything: the refusal named a domain its operator never configured.
+    const site = 'https://config.acme.internal/wechat'
+    expect(configurationImportPrompt('https://config.acme.internal/d/a.aws', site))
+      .toContain('请导入这份')
+    expect(() => configurationImportPrompt('https://aiworkskills.cn/d/a.aws', site))
+      .toThrow('config.acme.internal')
   })
 
   it('keeps product and image rules explicit in submitted tasks', () => {

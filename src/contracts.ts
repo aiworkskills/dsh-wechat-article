@@ -1,7 +1,9 @@
 /** Shared contracts subpath (`@aiworkskills/aws-wechat-article/contracts`). */
 
 export {
+  CONFIGURATION_EMBED_ROUTE,
   CONFIGURATION_STATUS_ROUTE,
+  type ConfigurationEmbedInfo,
   type ConfigurationState,
   type ConfigurationStatus,
 } from './configuration-contract.ts'

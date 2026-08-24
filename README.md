@@ -117,6 +117,43 @@ Skill。这类部署预置一份共享检出，并用 `skillSourceDir` 指向它
 Skill 版本随之固定，启动不再依赖网络。内网隔离环境、企业代理后，以及需要锁定 Skill
 版本的场景同理。目录需要是一份完整的 Git 检出（保留 `.git`，「更新 Skill」才可用）。
 
+### 换一个配置站
+
+`configurationUrl` 指定工作台内嵌的配置站，默认 `https://aiworkskills.cn/config`：
+
+```yaml
+- id: aws-wechat-article
+  name: '@aiworkskills/aws-wechat-article'
+  config:
+    configurationUrl: https://config.example.com/wechat
+```
+
+这一个值同时决定三件事：iframe 打开哪里、`postMessage` 只信任哪个来源、导入 `.aws`
+配置包时允许来自哪个域（该域及其子域）。
+
+> 早期版本里浏览器端把站点地址写死了，于是这个配置项只对 Host 侧生效——自建配置站的人
+> 改了它，iframe 仍然指向原站，导入还会被一个自己从未配置过的域名拒绝。现在浏览器端从
+> Host 读取，三处一致。
+
+### 托管部署：把工作台锁在一个工作集上
+
+给每个工作集单独起 Runtime 的托管部署（例如一个用户名下的多个公众号各占一个工作区），
+应通过 Runtime Gateway 设置 `DSHSERVER_WORKSPACE_ID`。插件会把它作为 `workspace`
+参数拼进配置站地址：
+
+```text
+https://config.example.com/wechat?embed=dsh&protocol=1&parentOrigin=…&workspace=<工作集 id>
+```
+
+对配置站而言这是一条约束：**当前工作区属于这个工作集**。配置站据此把自己锁在该工作集上，
+而不是让用户在 iframe 里切到别的账号——否则用户切过去再点「应用配置」，另一个账号的设置
+连同发布凭据就会被导入这个工作区。
+
+本机单工作区安装不设置这个变量，也就不带这个参数，配置站行为与以往完全一致：在那里切换
+账号正是选择「要配哪一个」的方式，去掉反而会把这条路堵死。
+
+插件只陈述事实，怎么处置由配置站决定。
+
 ## 怎么使用
 
 ### 1. 打开一个公众号项目

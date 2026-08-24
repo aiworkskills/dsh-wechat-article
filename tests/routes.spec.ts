@@ -6,11 +6,24 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import { registerConfigurationRoutes } from '../src/adapters/host/routes/configuration-routes.ts'
 import { registerProjectRoutes } from '../src/adapters/host/routes/project-routes.ts'
-import { CONFIGURATION_STATUS_ROUTE } from '../src/configuration-contract.ts'
+import { CONFIGURATION_EMBED_ROUTE, CONFIGURATION_STATUS_ROUTE } from '../src/configuration-contract.ts'
 import { PROJECT_SNAPSHOT_ROUTE } from '../src/project-contract.ts'
 import type { ConfigurationStatus } from '../src/configuration-contract.ts'
 
+const SITE = 'https://aiworkskills.cn/config'
+
 const roots: string[] = []
+
+/** Drive the embed route and return its parsed body. */
+async function embedInfo(options: { readonly configurationUrl: string }): Promise<Record<string, unknown>> {
+  const registry = createRouteRegistry()
+  registerConfigurationRoutes({ webServer: { register: registry.register } } as unknown as Context, options)
+  const handler = registry.routes.get(CONFIGURATION_EMBED_ROUTE)!
+  const mock = mockResponse()
+  await handler({ method: 'GET', url: CONFIGURATION_EMBED_ROUTE } as IncomingMessage, mock.res)
+  expect(mock.statusCode).toBe(200)
+  return JSON.parse(mock.body) as Record<string, unknown>
+}
 
 type RouteHandler = (req: IncomingMessage, res: ServerResponse) => Promise<void> | void
 
@@ -68,7 +81,7 @@ describe('workbench routes', () => {
       agents: { get: () => ({ session: { header: { cwd: workspace } } }) },
       wechatArticleConfiguration: { check: async () => status },
     } as unknown as Context
-    registerConfigurationRoutes(ctx)
+    registerConfigurationRoutes(ctx, { configurationUrl: SITE })
     const handler = registry.routes.get(CONFIGURATION_STATUS_ROUTE)
     expect(handler).toBeDefined()
     const mock = mockResponse()
@@ -84,12 +97,40 @@ describe('workbench routes', () => {
       agents: { get: () => undefined },
       wechatArticleConfiguration: { check: async () => ({ state: 'missing', ready: false, issues: [] }) },
     } as unknown as Context
-    registerConfigurationRoutes(ctx)
+    registerConfigurationRoutes(ctx, { configurationUrl: SITE })
     const handler = registry.routes.get(CONFIGURATION_STATUS_ROUTE)!
     const mock = mockResponse()
     await handler({ method: 'GET', url: CONFIGURATION_STATUS_ROUTE } as IncomingMessage, mock.res)
     expect(mock.statusCode).toBe(400)
     expect(JSON.parse(mock.body)).toMatchObject({ error: 'sessionId-required' })
+  })
+
+  it('tells the browser half where the configuration site is', async () => {
+    // It cannot read the plugin's configuration itself, so hardcoding a host was
+    // the only thing it could do — and that silently ignored `configurationUrl`.
+    const body = await embedInfo({ configurationUrl: 'https://config.acme.internal/wechat' })
+    expect(body).toEqual({ configurationUrl: 'https://config.acme.internal/wechat' })
+  })
+
+  it('reports the working set only when the Gateway confined this Runtime to one', async () => {
+    // Set by a Runtime Gateway that gives each working set its own Runtime. A
+    // plain local install has no such variable, and the missing field is what
+    // tells the configuration site nothing is being constrained.
+    const previous = process.env.DSHSERVER_WORKSPACE_ID
+    try {
+      delete process.env.DSHSERVER_WORKSPACE_ID
+      expect('workspaceId' in await embedInfo({ configurationUrl: SITE })).toBe(false)
+
+      process.env.DSHSERVER_WORKSPACE_ID = 'acct-7'
+      expect(await embedInfo({ configurationUrl: SITE })).toMatchObject({ workspaceId: 'acct-7' })
+
+      // Empty means "no second axis", not a working set named ''.
+      process.env.DSHSERVER_WORKSPACE_ID = '  '
+      expect('workspaceId' in await embedInfo({ configurationUrl: SITE })).toBe(false)
+    } finally {
+      if (previous === undefined) delete process.env.DSHSERVER_WORKSPACE_ID
+      else process.env.DSHSERVER_WORKSPACE_ID = previous
+    }
   })
 
   it('returns project snapshot for a configured workspace', async () => {

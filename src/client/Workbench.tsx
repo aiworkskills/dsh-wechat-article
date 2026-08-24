@@ -12,9 +12,11 @@ import {
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import { configurationImportPrompt } from './prompts.ts'
+import type { ConfigurationEmbedInfo } from '../configuration-contract.ts'
 import {
-  CONFIGURATION_ORIGIN,
   configurationEmbedUrl,
+  configurationOrigin,
+  fetchConfigurationEmbedInfo,
   parseConfigurationEmbedMessage,
 } from './configuration-embed.ts'
 import { ProjectWorkspace } from './ProjectWorkspace.tsx'
@@ -61,8 +63,28 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
   const [configurationMenuOpen, setConfigurationMenuOpen] = useState(false)
   const configurationFrame = useRef<HTMLIFrameElement>(null)
   const workspaceScroll = useRef<HTMLDivElement>(null)
-  const configurationUrl = useMemo(() => configurationEmbedUrl(window.location.origin), [])
-  const websiteConfigurationUrl = useMemo(() => new URL('/config', CONFIGURATION_ORIGIN).href, [])
+  // Deployment facts, not session state: which configuration site to embed, and
+  // whether this Runtime is confined to one working set. Both come from the Host
+  // because the browser bundle cannot see the plugin's configuration or the
+  // Runtime's environment.
+  const [embedInfo, setEmbedInfo] = useState<ConfigurationEmbedInfo | null>(null)
+  useEffect(() => {
+    const abort = new AbortController()
+    void fetchConfigurationEmbedInfo(abort.signal)
+      .then(info => { setEmbedInfo(info) })
+      .catch(() => {
+        // Leaving it null keeps the iframe unmounted and every message rejected,
+        // which is the safe direction: without a known origin there is nobody to
+        // trust. The configuration button reports it when pressed.
+      })
+    return () => { abort.abort() }
+  }, [])
+
+  const configurationUrl = useMemo(
+    () => (embedInfo === null ? '' : configurationEmbedUrl(window.location.origin, embedInfo)),
+    [embedInfo],
+  )
+  const websiteConfigurationUrl = embedInfo?.configurationUrl ?? ''
 
   useEffect(() => {
     workspaceScroll.current?.scrollTo({ top: 0, left: 0 })
@@ -83,15 +105,21 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
   }, [input.draft, inputActions])
 
   useEffect(() => {
+    // No known origin, nothing to trust: stay unregistered rather than fall back
+    // to a default that would accept messages from a site this deployment never
+    // configured.
+    if (embedInfo === null) return
+    const origin = configurationOrigin(embedInfo)
+
     const onMessage = (event: MessageEvent): void => {
-      if (event.origin !== CONFIGURATION_ORIGIN) return
+      if (event.origin !== origin) return
       if (event.source !== configurationFrame.current?.contentWindow) return
       const message = parseConfigurationEmbedMessage(event.data)
       if (message === null) return
       if (message.type === 'ready') return
 
       try {
-        const prompt = configurationImportPrompt(message.downloadUrl)
+        const prompt = configurationImportPrompt(message.downloadUrl, embedInfo.configurationUrl)
         setConfigurationMessageError('')
         if (run(prompt)) onClose()
       } catch (error) {
@@ -101,17 +129,18 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
 
     window.addEventListener('message', onMessage)
     return () => { window.removeEventListener('message', onMessage) }
-  }, [onClose, run])
+  }, [embedInfo, onClose, run])
 
   const handleConfigurationSelect = useCallback((action: ConfigurationMenuAction) => {
     setConfigurationMenuOpen(false)
     setConfigurationMessageError('')
-    if (action === 'embed') {
-      setSection('config')
-      return
-    }
-    if (action === 'website') {
-      openExternal(websiteConfigurationUrl)
+    if (action === 'embed' || action === 'website') {
+      if (websiteConfigurationUrl === '') {
+        setConfigurationMessageError('尚未取到配置站地址，请稍后重试')
+        return
+      }
+      if (action === 'embed') setSection('config')
+      else openExternal(websiteConfigurationUrl)
       return
     }
     if (sessionCwd === undefined) {
@@ -244,7 +273,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
             <span>正在检查项目配置</span>
           </main>
         )}
-        {section === 'config' && (
+        {section === 'config' && configurationUrl !== '' && (
           <main className={css.configView}>
             <iframe
               className={css.configFrame}

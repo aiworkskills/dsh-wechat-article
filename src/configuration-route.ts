@@ -9,6 +9,7 @@ import { registerWorkbenchRoutes } from './adapters/host/routes/index.ts'
 
 export {
   ARTICLE_FILE_ROUTE,
+  CONFIGURATION_EMBED_ROUTE,
   CONFIGURATION_STATUS_ROUTE,
   PRODUCT_CATEGORY_ROUTE,
   PRODUCT_DOCUMENT_ROUTE,
@@ -22,6 +23,11 @@ export {
 export const name = 'aiworkskills-wechat-configuration-route'
 export const inject = ['agents', 'webServer', 'wechatArticleConfiguration', 'wechatProductLibrary', 'wechatSkillSource']
 
-export function apply(ctx: Context): void {
-  ctx.effect(() => registerWorkbenchRoutes(ctx), 'wechat-article: workbench routes')
+export interface RouteOptions {
+  /** The configuration site this deployment uses; the browser half reads it from here. */
+  readonly configurationUrl: string
+}
+
+export function apply(ctx: Context, options: RouteOptions): void {
+  ctx.effect(() => registerWorkbenchRoutes(ctx, options), 'wechat-article: workbench routes')
 }

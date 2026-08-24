@@ -1,10 +1,19 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type { SessionId } from '@deepseek-ai/dsh-session'
-import { CONFIGURATION_STATUS_ROUTE } from '../../../configuration-contract.ts'
+import {
+  CONFIGURATION_EMBED_ROUTE,
+  CONFIGURATION_STATUS_ROUTE,
+  type ConfigurationEmbedInfo,
+} from '../../../configuration-contract.ts'
 import { sendJson } from './shared/http.ts'
 
-export function registerConfigurationRoutes(ctx: Context): () => void {
-  return ctx.webServer.register({
+export interface ConfigurationRouteOptions {
+  /** The configuration site this deployment uses, already validated absolute. */
+  readonly configurationUrl: string
+}
+
+export function registerConfigurationRoutes(ctx: Context, options: ConfigurationRouteOptions): () => void {
+  const status = ctx.webServer.register({
     kind: 'exact',
     path: CONFIGURATION_STATUS_ROUTE,
     async handler(req, res) {
@@ -32,4 +41,36 @@ export function registerConfigurationRoutes(ctx: Context): () => void {
       sendJson(res, 200, await ctx.wechatArticleConfiguration.check(workspace))
     },
   })
+
+  const embed = ctx.webServer.register({
+    kind: 'exact',
+    path: CONFIGURATION_EMBED_ROUTE,
+    handler(req, res) {
+      if (req.method !== 'GET') {
+        res.setHeader('Allow', 'GET')
+        sendJson(res, 405, { error: 'method-not-allowed' })
+        return
+      }
+      sendJson(res, 200, embedInfo(options.configurationUrl))
+    },
+  })
+
+  return () => {
+    embed()
+    status()
+  }
+}
+
+/**
+ * `DSHSERVER_WORKSPACE_ID` is set by a Runtime Gateway that gives each working
+ * set its own Runtime. A plain local install has no such variable and gets an
+ * answer without the field, which is what tells the configuration site that
+ * nothing is being constrained.
+ */
+function embedInfo(configurationUrl: string): ConfigurationEmbedInfo {
+  const workspaceId = process.env.DSHSERVER_WORKSPACE_ID?.trim()
+  return {
+    configurationUrl,
+    ...(workspaceId === undefined || workspaceId === '' ? {} : { workspaceId }),
+  }
 }
