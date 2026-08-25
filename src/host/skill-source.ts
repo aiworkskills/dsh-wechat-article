@@ -1,7 +1,8 @@
 import { mkdir, mkdtemp, rename, rm, stat } from 'node:fs/promises'
 import { basename, dirname } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
-import '@deepseek-ai/dsh-subprocess'
+// 类型导入：要的是 `ctx.subprocess` 的服务声明，值层面由 Harness 组合提供。
+import type {} from '@deepseek-ai/dsh-subprocess'
 import type { SkillSourceStatus } from '../contracts/skill-source.ts'
 import {
   SKILL_REPOSITORY,

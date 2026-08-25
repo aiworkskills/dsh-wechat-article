@@ -1,6 +1,7 @@
 /** Product knowledge-base and image-library service backed by `.aws-article/products`. */
 import { Context, Service } from '@deepseek-ai/cordis'
-import '@deepseek-ai/dsh-subprocess'
+// 类型导入：要的是 `ctx.subprocess` 的服务声明，值层面由 Harness 组合提供。
+import type {} from '@deepseek-ai/dsh-subprocess'
 import z from '@deepseek-ai/schemastery'
 import * as mutations from '../domain/library/mutations.ts'
 import { findDocuments, findImages, listProducts } from '../domain/library/query.ts'

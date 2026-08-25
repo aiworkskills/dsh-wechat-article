@@ -1,6 +1,7 @@
 /** Human commands for discovering the bundle and opening its deployed configuration site. */
 import type { Context } from '@deepseek-ai/cordis'
-import '@deepseek-ai/dsh-commands'
+// 类型导入：要的是 `ctx.commands` 的服务声明，值层面由 Harness 组合提供。
+import type {} from '@deepseek-ai/dsh-commands'
 import z from '@deepseek-ai/schemastery'
 
 const DEFAULT_CONFIGURATION_URL = 'https://aiworkskills.cn/config'

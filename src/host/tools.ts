@@ -1,7 +1,7 @@
 /** Model tools for reading and maintaining the project product library. */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import './configuration.ts'
+import type {} from './configuration.ts'
 
 function workspaceOf(exec: { readonly agent?: { readonly session: { readonly header: { readonly cwd?: string } } } }): string {
   const cwd = exec.agent?.session.header.cwd

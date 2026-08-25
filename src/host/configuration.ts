@@ -2,7 +2,8 @@
 import { readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
-import '@deepseek-ai/dsh-subprocess'
+// 类型导入：要的是 `ctx.subprocess` 的服务声明，值层面由 Harness 组合提供。
+import type {} from '@deepseek-ai/dsh-subprocess'
 import z from '@deepseek-ai/schemastery'
 import { parse } from 'yaml'
 import type { ConfigurationStatus } from '../contracts/configuration.ts'
