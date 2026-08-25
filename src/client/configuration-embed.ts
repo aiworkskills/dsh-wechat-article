@@ -13,7 +13,8 @@ function isInfo(value: unknown): value is ConfigurationEmbedInfo {
   if (typeof value !== 'object' || value === null) return false
   const candidate = value as Partial<ConfigurationEmbedInfo>
   if (typeof candidate.configurationUrl !== 'string' || candidate.configurationUrl === '') return false
-  return candidate.workspaceId === undefined || typeof candidate.workspaceId === 'string'
+  if (candidate.workspaceId !== undefined && typeof candidate.workspaceId !== 'string') return false
+  return candidate.workbenchLabel === undefined || typeof candidate.workbenchLabel === 'string'
 }
 
 /**

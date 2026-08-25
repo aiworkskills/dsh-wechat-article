@@ -3,16 +3,19 @@ import { IconSkillOutline16, Tooltip } from '@deepseek-ai/dsh-client-ui-primitiv
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type { WorkbenchPanelController } from './panel-controller.ts'
+import type { WorkbenchLabelStore } from './workbench-label.ts'
 import css from './workbench.module.css'
 
 interface SidebarActionFace {
   readonly panel: WorkbenchPanelController
+  readonly label: WorkbenchLabelStore
 }
 
 export type SidebarActionProps = PropsRuntime<'sidebar.footer.action'> & InjectFace<SidebarActionFace>
 
-/** Add the persistent WeChat entry above Settings in the native sidebar. */
-export function SidebarAction({ wide, useSessions, panel }: SidebarActionProps) {
+/** Add the persistent workbench entry above Settings in the native sidebar. */
+export function SidebarAction({ wide, useSessions, panel, label }: SidebarActionProps) {
+  const name = useSyncExternalStore(label.subscribe, label.snapshot, label.snapshot)
   const open = useSyncExternalStore(panel.subscribe, panel.getSnapshot, panel.getSnapshot)
   const current = useSessions(state => state.current)
   const available = useSessions(state => current !== undefined && state.byId[current]?.blank === false)
@@ -25,18 +28,18 @@ export function SidebarAction({ wide, useSessions, panel }: SidebarActionProps) 
 
   return (
     <div className={wide ? css.sidebarActionRoot : `${css.sidebarActionRoot} ${css.sidebarActionRail}`}>
-      <Tooltip label="公众号工作台" side="right" disabled={wide}>
+      <Tooltip label={name} side="right" disabled={wide}>
         <button
           className={css.sidebarAction}
           type="button"
-          aria-label="公众号工作台"
+          aria-label={name}
           aria-expanded={open}
           aria-pressed={open}
           disabled={!available}
           onClick={panel.toggle}
         >
           <IconSkillOutline16 size={wide ? 16 : 18} />
-          {wide && <span>公众号</span>}
+          {wide && <span>{name}</span>}
         </button>
       </Tooltip>
     </div>

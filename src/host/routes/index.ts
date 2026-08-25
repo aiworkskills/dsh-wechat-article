@@ -27,6 +27,8 @@ export interface RouteOptions {
   readonly configurationUrl: string
   /** Which working set this Runtime serves, when the deployment confines it to one. */
   readonly workspaceId?: string
+  /** What to call the workbench in the sidebar; absent means the plugin's own name. */
+  readonly workbenchLabel?: string
 }
 
 export function apply(ctx: Context, options: RouteOptions): void {

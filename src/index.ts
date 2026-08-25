@@ -33,6 +33,14 @@ export interface Config {
    * 知道那个标识来自哪个网关、叫什么环境变量。
    */
   readonly workspaceId?: string
+  /**
+   * 左边栏里这个工作台叫什么。留空即插件自己的名字。
+   *
+   * 把工作台嵌进更大的产品里时，账号身份往往已经由外面那一层承载了，这一项于是
+   * 该命名一件**事**（"创作素材"）而不是把账号再念一遍。插件对哪种叫法更对没有
+   * 意见 —— 它只是不再是唯一有权发表意见的那个。
+   */
+  readonly workbenchLabel?: string
 }
 
 export const Config: z<Config> = z.object({
@@ -43,6 +51,7 @@ export const Config: z<Config> = z.object({
   configurationUrl: z.string().default('https://aiworkskills.cn/config'),
   skillSourceDir: z.string().default(''),
   workspaceId: z.string().default(''),
+  workbenchLabel: z.string().default(''),
 })
 
 export const name = 'aws-wechat-article'
@@ -57,6 +66,7 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
   const configurationUrl = config.configurationUrl ?? 'https://aiworkskills.cn/config'
   const skillSourceDir = config.skillSourceDir ?? ''
   const workspaceId = config.workspaceId?.trim() ?? ''
+  const workbenchLabel = config.workbenchLabel?.trim() ?? ''
   new WechatProductLibrary(ctx, {
     pythonCommand,
     maxDocumentBytes,
@@ -68,6 +78,7 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
   registerRoutes(ctx, {
     configurationUrl,
     ...(workspaceId === '' ? {} : { workspaceId }),
+    ...(workbenchLabel === '' ? {} : { workbenchLabel }),
   })
   registerTools(ctx)
   registerCommands(ctx, { configurationUrl })

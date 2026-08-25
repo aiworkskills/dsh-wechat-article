@@ -8,6 +8,7 @@ import { SidebarAction } from './SidebarAction.tsx'
 import { Workbench } from './Workbench.tsx'
 import { createWorkbenchPanelController } from './panel-controller.ts'
 import { fetchProjectSnapshot } from './project-snapshot.ts'
+import { createWorkbenchLabelStore, loadWorkbenchLabel } from './workbench-label.ts'
 
 export const inject = ['slots', 'layout', 'inputTriggers', 'workspaces']
 
@@ -50,6 +51,13 @@ function articleReferenceSource(): InputTriggerSource {
 }
 
 export function apply(ctx: ClientContext): void {
+  // 名字取自 Host,而侧边栏那颗按钮在任何会话之前就已经挂上,所以取值在这里发起,
+  // 不在组件里 —— 组件订阅结果,取不到就一直是插件自己的名字。
+  const label = createWorkbenchLabelStore()
+  const labelFetch = new AbortController()
+  loadWorkbenchLabel(label, labelFetch.signal)
+  ctx.effect(() => () => { labelFetch.abort() }, 'wechat-article: workbench label')
+
   const inputTriggers = ctx.inputTriggers as InputTriggerServiceContract | undefined
   if (inputTriggers !== undefined) ctx.effect(() => inputTriggers.registerSource(articleReferenceSource()), 'wechat-article: @ article files')
   let panel = createWorkbenchPanelController({
@@ -72,6 +80,6 @@ export function apply(ctx: ClientContext): void {
     name: 'sidebar.footer.action',
     id: 'wechat-article-workbench',
     order: 20,
-    inject: () => ({ panel }),
+    inject: () => ({ panel, label }),
   }, SidebarAction))
 }

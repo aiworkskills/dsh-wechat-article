@@ -12,6 +12,8 @@ export interface ConfigurationRouteOptions {
   readonly configurationUrl: string
   /** Which working set this Runtime serves; absent for an ordinary single-workspace install. */
   readonly workspaceId?: string
+  /** What to call the workbench in the sidebar; absent means the plugin's own name. */
+  readonly workbenchLabel?: string
 }
 
 export function registerConfigurationRoutes(ctx: Context, options: ConfigurationRouteOptions): () => void {
@@ -73,8 +75,10 @@ export function registerConfigurationRoutes(ctx: Context, options: Configuration
  */
 function embedInfo(options: ConfigurationRouteOptions): ConfigurationEmbedInfo {
   const workspaceId = options.workspaceId?.trim()
+  const workbenchLabel = options.workbenchLabel?.trim()
   return {
     configurationUrl: options.configurationUrl,
     ...(workspaceId === undefined || workspaceId === '' ? {} : { workspaceId }),
+    ...(workbenchLabel === undefined || workbenchLabel === '' ? {} : { workbenchLabel }),
   }
 }

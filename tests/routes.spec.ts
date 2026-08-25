@@ -123,6 +123,15 @@ describe('workbench routes', () => {
     expect('workspaceId' in await embedInfo({ configurationUrl: SITE, workspaceId: '  ' })).toBe(false)
   })
 
+  it('names the workbench only when the deployment renamed it', async () => {
+    // 缺席意味着"用插件自己的名字",不是一个空名字。嵌进更大的产品里时,账号身份
+    // 往往已经由外面那一层承载,这一项于是该命名一件事而不是把账号再念一遍。
+    expect('workbenchLabel' in await embedInfo({ configurationUrl: SITE })).toBe(false)
+    expect(await embedInfo({ configurationUrl: SITE, workbenchLabel: '创作素材' }))
+      .toMatchObject({ workbenchLabel: '创作素材' })
+    expect('workbenchLabel' in await embedInfo({ configurationUrl: SITE, workbenchLabel: ' ' })).toBe(false)
+  })
+
   it('returns project snapshot for a configured workspace', async () => {
     const workspace = await mkdtemp(join(tmpdir(), 'wechat-route-'))
     roots.push(workspace)

@@ -45,4 +45,15 @@ export interface ConfigurationEmbedInfo {
    * The plugin only states the fact. What to do about it is the site's call.
    */
   readonly workspaceId?: string
+
+  /**
+   * What to call the workbench in the sidebar.
+   *
+   * Absent means the plugin's own name. A deployment that frames this workbench
+   * inside a larger product may already carry the account identity elsewhere,
+   * which leaves this entry naming a *thing* ("materials") rather than repeating
+   * the account. The plugin has no opinion about which is right; it just stops
+   * being the only one allowed to have one.
+   */
+  readonly workbenchLabel?: string
 }
