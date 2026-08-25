@@ -53,7 +53,7 @@ function MaterialFile({ kind, item, sessionId, busy, onPreview, onRename, onDele
   }
   const icon = kind === 'document'
     ? <span className={css.documentIcon}>#</span>
-    : <img className={css.materialImageThumb} src={productImageUrl(sessionId, item.path)} alt="" />
+    : <img className={css.materialImageThumb} loading="lazy" decoding="async" src={productImageUrl(sessionId, item.path)} alt="" />
   const detail = kind === 'document'
     ? 'Markdown 文档'
     : `图片 · ${(item as ProductImageSummary).hasDescription ? '已描述' : '待补描述'}`

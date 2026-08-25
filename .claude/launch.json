@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dsh-web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "/Users/longsen/Documents/code/deepseek-harness",
+        "dsh",
+        "web",
+        "--port",
+        "3081"
+      ],
+      "port": 3081
+    }
+  ]
+}

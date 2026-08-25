@@ -5,7 +5,7 @@ import { extname } from 'node:path'
 import { ARTICLE_FILE_ROUTE, PROJECT_EVENTS_ROUTE, PROJECT_SNAPSHOT_ROUTE } from '../../contracts/project.ts'
 import { watchProjectWorkspace } from '../../domain/project/watch.ts'
 import { projectSnapshot, resolveArticleFile } from '../../domain/project/snapshot.ts'
-import { imageContentType, sendJson } from './shared/http.ts'
+import { fileValidators, imageCacheHeaders, imageContentType, isFresh, sendJson } from './shared/http.ts'
 import { sessionWorkspace } from './shared/session.ts'
 
 export function registerProjectRoutes(ctx: Context, eventConnections: Set<() => void>): () => void {
@@ -102,7 +102,15 @@ export function registerProjectRoutes(ctx: Context, eventConnections: Set<() => 
           }
           const imageType = imageContentType(resolved)
           if (imageType !== undefined) {
-            res.writeHead(200, { 'Cache-Control': 'private, max-age=60', 'Content-Length': info.size, 'Content-Type': imageType })
+            // 智能体随时会重写这些图,所以不设"免问期";带上校验器之后,每次开面板
+            // 的代价从"全量重下"降到"一个 304"。
+            const cache = imageCacheHeaders(info, 0)
+            if (isFresh(req, fileValidators(info))) {
+              res.writeHead(304, cache)
+              res.end()
+              return
+            }
+            res.writeHead(200, { ...cache, 'Content-Length': info.size, 'Content-Type': imageType })
             createReadStream(resolved).pipe(res)
             return
           }

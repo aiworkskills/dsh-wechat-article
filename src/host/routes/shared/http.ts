@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import type { Stats } from 'node:fs'
 import { extname } from 'node:path'
 import { UserInputError } from '../../../domain/errors.ts'
 
@@ -75,4 +76,54 @@ export function imagePayload(dataUrl: string): { readonly extension: string; rea
   const data = Buffer.from(encoded, 'base64')
   if (data.length === 0 || data.length > 10 * 1024 * 1024) throw new UserInputError('图片大小必须在 10 MB 以内')
   return { extension, data }
+}
+
+/**
+ * 校验器:文件的身份,而不是它的内容。
+ *
+ * 用 size+mtime 而不是内容哈希 —— 后者要把整张图读一遍才能决定"不用发",
+ * 而这些文件动辄几百 KB。弱校验器(W/)正是为这种"够用就好"的判断准备的。
+ */
+export function fileValidators(info: Stats): { readonly etag: string; readonly lastModified: string } {
+  const seconds = Math.floor(info.mtimeMs / 1000)
+  return {
+    etag: `W/"${info.size.toString(16)}-${seconds.toString(16)}"`,
+    lastModified: new Date(seconds * 1000).toUTCString(),
+  }
+}
+
+/**
+ * 这个请求是否可以用 304 打发。
+ *
+ * If-None-Match 优先于 If-Modified-Since —— HTTP 规范如此,而且 mtime 只有秒级
+ * 精度,同一秒内的两次改写它分辨不出来,ETag 带上了大小则能。
+ */
+export function isFresh(req: IncomingMessage, validators: { readonly etag: string; readonly lastModified: string }): boolean {
+  const noneMatch = req.headers['if-none-match']
+  if (noneMatch !== undefined) {
+    return noneMatch.split(',').some(candidate => candidate.trim() === validators.etag)
+  }
+  const since = req.headers['if-modified-since']
+  if (since === undefined) return false
+  const asked = Date.parse(since)
+  return !Number.isNaN(asked) && Date.parse(validators.lastModified) <= asked
+}
+
+/**
+ * 图片响应的缓存头。
+ *
+ * `maxAge` 是"多久之内**连问都不问**"。文章配图给 0:智能体正在改它们,过期的
+ * 封面比多一次条件请求难受得多 —— 而带上校验器之后,那次请求的代价是一个 304,
+ * 几百字节。素材库改动少,给 5 分钟。
+ */
+export function imageCacheHeaders(
+  info: Stats,
+  maxAge: number,
+): Record<string, string> {
+  const validators = fileValidators(info)
+  return {
+    'Cache-Control': maxAge === 0 ? 'private, max-age=0, must-revalidate' : `private, max-age=${String(maxAge)}`,
+    'ETag': validators.etag,
+    'Last-Modified': validators.lastModified,
+  }
 }

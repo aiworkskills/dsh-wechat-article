@@ -52,7 +52,7 @@ export function ArticleBrowser({
           : article.files.map(file => <div className={css.articleFileRow} key={file.path}>
           <button type="button" className={css.articleFileOpen} onClick={() => { setSelectedFile(file) }}>
             {file.kind === 'image'
-              ? <img className={css.articleImageThumb} src={articleFileUrl(sessionId, file.path)} alt="" />
+              ? <img className={css.articleImageThumb} loading="lazy" decoding="async" src={articleFileUrl(sessionId, file.path)} alt="" />
               : <span className={file.kind === 'html' ? css.htmlFileIcon : css.markdownFileIcon}>{file.kind === 'html' ? '</>' : '#'}</span>}
             <span><strong>{filename(file.path)}</strong><small>{file.label}</small></span>
           </button>

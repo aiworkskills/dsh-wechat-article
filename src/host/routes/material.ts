@@ -4,7 +4,10 @@ import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { resolveProductDocumentPath, resolveProductImagePath } from '../../domain/paths/workspace-paths.ts'
 import { PRODUCT_CATEGORY_ROUTE, PRODUCT_DOCUMENT_ROUTE, PRODUCT_IMAGE_INGEST_ROUTE, PRODUCT_IMAGE_ROUTE } from '../../contracts/project.ts'
-import { imageContentType, imagePayload, mapRouteError, readJson, requireSameOrigin, sendJson, textField } from './shared/http.ts'
+import {
+  fileValidators, imageCacheHeaders, imageContentType, imagePayload, isFresh,
+  mapRouteError, readJson, requireSameOrigin, sendJson, textField,
+} from './shared/http.ts'
 import { sessionWorkspace } from './shared/session.ts'
 
 export function registerMaterialRoutes(ctx: Context): () => void {
@@ -66,7 +69,14 @@ export function registerMaterialRoutes(ctx: Context): () => void {
             sendJson(res, 404, { error: 'image-not-found' })
             return
           }
-          res.writeHead(200, { 'Cache-Control': 'private, max-age=300', 'Content-Length': info.size, 'Content-Type': contentType })
+          // 素材改动少,给五分钟免问期;过期之后同样走校验器换 304。
+          const cache = imageCacheHeaders(info, 300)
+          if (isFresh(req, fileValidators(info))) {
+            res.writeHead(304, cache)
+            res.end()
+            return
+          }
+          res.writeHead(200, { ...cache, 'Content-Length': info.size, 'Content-Type': contentType })
           createReadStream(resolved).pipe(res)
         } catch {
           sendJson(res, 404, { error: 'image-not-found' })
