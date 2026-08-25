@@ -20,7 +20,7 @@ import { registerProjectRoutes } from './project.ts'
 import { registerSkillSourceRoutes } from './skill-source.ts'
 
 export const name = 'aiworkskills-wechat-workbench-routes'
-export const inject = ['agents', 'webServer', 'wechatArticleConfiguration', 'wechatProductLibrary', 'wechatSkillSource']
+export const inject = ['agents', 'webServer', 'wechatArticleConfiguration', 'wechatProductLibrary', 'wechatSkillSource', 'wechatThumbnails']
 
 export interface RouteOptions {
   /** The configuration site this deployment uses; the browser half reads it from here. */

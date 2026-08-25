@@ -5,7 +5,7 @@ import { extname } from 'node:path'
 import { ARTICLE_FILE_ROUTE, PROJECT_EVENTS_ROUTE, PROJECT_SNAPSHOT_ROUTE } from '../../contracts/project.ts'
 import { watchProjectWorkspace } from '../../domain/project/watch.ts'
 import { projectSnapshot, resolveArticleFile } from '../../domain/project/snapshot.ts'
-import { fileValidators, imageCacheHeaders, imageContentType, isFresh, sendJson } from './shared/http.ts'
+import { fileValidators, imageCacheHeaders, imageContentType, isFresh, sendJson, wantsThumbnail } from './shared/http.ts'
 import { sessionWorkspace } from './shared/session.ts'
 
 export function registerProjectRoutes(ctx: Context, eventConnections: Set<() => void>): () => void {
@@ -108,6 +108,16 @@ export function registerProjectRoutes(ctx: Context, eventConnections: Set<() => 
             if (isFresh(req, fileValidators(info))) {
               res.writeHead(304, cache)
               res.end()
+              return
+            }
+            // 缩略图拿不到就发原图 —— 这是优化不是能力,它坏掉的正确表现是变慢,
+            // 不是看不见图。校验器仍取自源文件,所以 304 的语义两条路一致。
+            const thumb = wantsThumbnail(req.url ?? ARTICLE_FILE_ROUTE, ARTICLE_FILE_ROUTE)
+              ? await ctx.wechatThumbnails.render(resolved, info.mtimeMs)
+              : null
+            if (thumb !== null) {
+              res.writeHead(200, { ...cache, 'Content-Length': thumb.byteLength, 'Content-Type': 'image/jpeg' })
+              res.end(thumb)
               return
             }
             res.writeHead(200, { ...cache, 'Content-Length': info.size, 'Content-Type': imageType })

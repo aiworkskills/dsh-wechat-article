@@ -10,6 +10,7 @@ import z from '@deepseek-ai/schemastery'
 import { apply as registerCommands } from './host/commands.ts'
 import { WechatArticleConfiguration } from './host/configuration.ts'
 import { WechatProductLibrary } from './host/library.ts'
+import { WechatThumbnails } from './host/thumbnails.ts'
 import { apply as registerRoutes } from './host/routes/index.ts'
 import { apply as registerSkills } from './host/skills.ts'
 import { apply as registerTools } from './host/tools.ts'
@@ -41,6 +42,8 @@ export interface Config {
    * 意见 —— 它只是不再是唯一有权发表意见的那个。
    */
   readonly workbenchLabel?: string
+  /** 缩略图内存缓存上限（字节）。留 0 用默认的 8 MiB。 */
+  readonly thumbnailCacheBytes?: number
 }
 
 export const Config: z<Config> = z.object({
@@ -52,6 +55,7 @@ export const Config: z<Config> = z.object({
   skillSourceDir: z.string().default(''),
   workspaceId: z.string().default(''),
   workbenchLabel: z.string().default(''),
+  thumbnailCacheBytes: z.number().default(0),
 })
 
 export const name = 'aws-wechat-article'
@@ -67,6 +71,7 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
   const skillSourceDir = config.skillSourceDir ?? ''
   const workspaceId = config.workspaceId?.trim() ?? ''
   const workbenchLabel = config.workbenchLabel?.trim() ?? ''
+  const thumbnailCacheBytes = config.thumbnailCacheBytes ?? 0
   new WechatProductLibrary(ctx, {
     pythonCommand,
     maxDocumentBytes,
@@ -74,6 +79,7 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
     skillSourceDir,
   })
   new WechatArticleConfiguration(ctx, { pythonCommand, skillSourceDir })
+  new WechatThumbnails(ctx, { pythonCommand, ...(thumbnailCacheBytes === 0 ? {} : { thumbnailCacheBytes }) })
   await registerSkills(ctx, { gitCommand, skillSourceDir })
   registerRoutes(ctx, {
     configurationUrl,

@@ -127,3 +127,13 @@ export function imageCacheHeaders(
     'Last-Modified': validators.lastModified,
   }
 }
+
+/**
+ * 请求要的是缩略图吗。
+ *
+ * 只认一个开关而不是任意宽度：宽度由调用方自由指定的话，缓存键就是无界的，
+ * 而每一次未命中都要拉起一次图像解码 —— 那是个放大器。
+ */
+export function wantsThumbnail(url: string, route: string): boolean {
+  return new URL(url || route, 'http://localhost').searchParams.get('thumb') === '1'
+}

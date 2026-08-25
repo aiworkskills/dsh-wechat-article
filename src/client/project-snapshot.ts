@@ -46,12 +46,22 @@ export function watchProjectSnapshot(sessionId: string, onChange: () => void): (
   return () => { events.close() }
 }
 
-export function articleFileUrl(sessionId: string, path: string): string {
-  return `${ARTICLE_FILE_ROUTE}?${new URLSearchParams({ sessionId, path }).toString()}`
+/**
+ * 缩略图与原图是同一条路由上的两个参数,不是两条路由。
+ *
+ * 路径收敛那段逻辑只该有一份 —— 复制一条"缩略图专用"的路由出来,就等于把
+ * "不许读到工作区外面"这件事写了两遍,而两遍迟早会不一样。
+ */
+export function articleFileUrl(sessionId: string, path: string, thumb = false): string {
+  const query = new URLSearchParams({ sessionId, path })
+  if (thumb) query.set('thumb', '1')
+  return `${ARTICLE_FILE_ROUTE}?${query.toString()}`
 }
 
-export function productImageUrl(sessionId: string, path: string): string {
-  return `${PRODUCT_IMAGE_ROUTE}?${new URLSearchParams({ sessionId, path }).toString()}`
+export function productImageUrl(sessionId: string, path: string, thumb = false): string {
+  const query = new URLSearchParams({ sessionId, path })
+  if (thumb) query.set('thumb', '1')
+  return `${PRODUCT_IMAGE_ROUTE}?${query.toString()}`
 }
 
 async function writeProjectData(route: string, sessionId: string, body: Record<string, string>): Promise<void> {

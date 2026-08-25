@@ -6,7 +6,7 @@ import { resolveProductDocumentPath, resolveProductImagePath } from '../../domai
 import { PRODUCT_CATEGORY_ROUTE, PRODUCT_DOCUMENT_ROUTE, PRODUCT_IMAGE_INGEST_ROUTE, PRODUCT_IMAGE_ROUTE } from '../../contracts/project.ts'
 import {
   fileValidators, imageCacheHeaders, imageContentType, imagePayload, isFresh,
-  mapRouteError, readJson, requireSameOrigin, sendJson, textField,
+  mapRouteError, readJson, requireSameOrigin, sendJson, textField, wantsThumbnail,
 } from './shared/http.ts'
 import { sessionWorkspace } from './shared/session.ts'
 
@@ -74,6 +74,14 @@ export function registerMaterialRoutes(ctx: Context): () => void {
           if (isFresh(req, fileValidators(info))) {
             res.writeHead(304, cache)
             res.end()
+            return
+          }
+          const thumb = wantsThumbnail(req.url ?? PRODUCT_IMAGE_ROUTE, PRODUCT_IMAGE_ROUTE)
+            ? await ctx.wechatThumbnails.render(resolved, info.mtimeMs)
+            : null
+          if (thumb !== null) {
+            res.writeHead(200, { ...cache, 'Content-Length': thumb.byteLength, 'Content-Type': 'image/jpeg' })
+            res.end(thumb)
             return
           }
           res.writeHead(200, { ...cache, 'Content-Length': info.size, 'Content-Type': contentType })
