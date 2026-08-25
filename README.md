@@ -1,26 +1,40 @@
 # aws-wechat-article
 
-## 这是什么
+**在对话里写完一篇公众号文章 —— 从选题一路到微信草稿箱。**
 
-`aws-wechat-article` 是一个运行在 [DeepSeek Harness](https://github.com/deepseek-ai/DeepSeek-Harness) 中的微信公众号创作插件。
+给 [DeepSeek Harness](https://github.com/deepseek-ai/DeepSeek-Harness) 装上这个插件，
+然后像平时说话一样开口：
 
-安装后，你可以直接在 DeepSeek Harness 的对话中完成一篇公众号文章：
+```text
+写一篇介绍 DeepSeek Harness 插件体系的公众号文章，面向有 TypeScript
+经验的开发者。先给我几个选题方向，确认后再继续写。
+```
 
-- 确定选题和标题
-- 搜集、整理写作素材
-- 撰写和修改文章
-- 审稿与优化表达
-- 生成公众号排版
-- 生成封面和正文配图
-- 发布到微信公众号草稿箱
-
-整个过程仍然在对话中完成。插件在右侧增加了一个“公众号”工作台，帮助你查看文章定稿、排版文件和配图，也可以管理写作需要的产品资料与图片。
+它会依次完成**选题、写稿、审稿、排版、配图、发布**，把定稿、HTML 和图片留在你自己的
+项目目录里，需要你拍板的地方停下来问你。
 
 ![从选题到发布的完整公众号工作流](docs/全自动完成文章从选题到发布.png)
 
-它不是另一套公众号写作方法，而是把开源项目 [wechat-article-skills](https://github.com/aiworkskills/wechat-article-skills) 接入 DeepSeek Harness。文章如何选题、写作、审稿、排版、配图和发布，仍然由原版 Skill 决定。
+> 社区预览版，适配 DeepSeek Harness `0.1.1-rc.2`。
 
-> 当前版本是社区预览版，适配 DeepSeek Harness `0.1.1-rc.2`。
+## 凭什么不是「再套一层提示词」
+
+**方法论是公开的，而且不在这个插件里。**
+怎么选题、怎么审稿、排版长什么样，全部由
+[wechat-article-skills](https://github.com/aiworkskills/wechat-article-skills)
+这个独立仓库决定 —— 9 个 Skill，你能读它、改它、也能在别的支持 Skills 的工具里用它。
+插件只负责接线，不重新发明一套写法，更不会把方法藏进自己的代码里。
+
+**素材是长期资产，不是每次重贴。**
+产品资料、案例、配图按内容方向存在项目里，写文章时说一句「用公众号 Skills 这个方向」，
+智能体自己去取，并优先从对应图片里挑正文配图。
+
+**终点是草稿箱，不是聊天框。**
+排版 HTML、封面、正文配图都会生成好，配置了公众号凭据之后直接进微信草稿箱 ——
+不需要你把内容从对话里一段段搬出去。
+
+**东西都在你自己的目录里。**
+文章、配置、素材全部落在当前项目下，插件不建立另一份云端资料库。
 
 ## 怎么安装
 
@@ -62,133 +76,6 @@ pnpm dsh web --port 3081
 ```
 
 打开 `http://127.0.0.1:3081/`。安装成功后，左侧栏底部会出现“公众号”，插件管理页中只会显示一个插件：`aws-wechat-article`。
-
-### 插件加载在 Host 平面，不是 Agent Preset
-
-上面的 `dsh plugin add` 会把插件写进 profile 的 `bundles`，也就是 Host 组合——这是它
-唯一能工作的位置。托管部署自己拼装 profile 时同理，在 `cordis.patch.yml` 里 `insert`：
-
-```yaml
-- insert:
-    - id: aws-wechat-article
-      name: '@aiworkskills/aws-wechat-article'
-```
-
-**不要写进 Agent Preset 的 `agent.cordis.yml`。** 插件注册的是进程级 Cordis 服务
-（`wechatArticleConfiguration`、`wechatProductLibrary`、`wechatSkillSource`），Harness
-会拒绝挂载并报：
-
-```
-preset service must sit behind an `isolate` realm or move to the host composition
-```
-
-这条报错不会指出该放哪，照着「装插件」的直觉放进 Preset 很容易撞上。
-
-### 换一个目录布局
-
-上面的命令把两个仓库放在固定位置，是为了让复制粘贴就能跑通。这个布局不是必须的。
-
-构建客户端界面时需要读取 Harness 源码里的构建预设（这部分没有随 npm 发布），默认按
-`../../deepseek-harness` 查找。仓库放在别处时，用 `DSH_SOURCE_ROOT` 指明位置即可：
-
-```bash
-DSH_SOURCE_ROOT=/path/to/deepseek-harness pnpm build
-```
-
-容器构建、CI 以及把插件放进自有工作区的情况都适用。路径无效时构建会直接说明缺少什么，
-而不是抛出一串类型错误。
-
-### 使用预置的 Skill 检出
-
-默认情况下，公众号 Skill 由插件 `git clone` 到 DSH_HOME 下，每个 DSH_HOME 各持一份。
-单机单用户时这样最省事。
-
-托管部署不适用这个默认值：那里每个用户都有独立的 DSH_HOME，于是每来一个新用户就要
-重新 clone 一次 GitHub —— 既要求运行环境能访问外网，也让不同用户可能拿到不同版本的
-Skill。这类部署预置一份共享检出，并用 `skillSourceDir` 指向它：
-
-```yaml
-- id: aws-wechat-article
-  name: '@aiworkskills/aws-wechat-article'
-  config:
-    skillSourceDir: /opt/wechat-article-skills
-```
-
-Skill 版本随之固定，启动不再依赖网络。内网隔离环境、企业代理后，以及需要锁定 Skill
-版本的场景同理。目录需要是一份完整的 Git 检出（保留 `.git`，「更新 Skill」才可用）。
-
-### 换一个配置站
-
-`configurationUrl` 指定工作台内嵌的配置站，默认 `https://aiworkskills.cn/config`：
-
-```yaml
-- id: aws-wechat-article
-  name: '@aiworkskills/aws-wechat-article'
-  config:
-    configurationUrl: https://config.example.com/wechat
-```
-
-这一个值同时决定三件事：iframe 打开哪里、`postMessage` 只信任哪个来源、导入 `.aws`
-配置包时允许来自哪个域（该域及其子域）。
-
-> 早期版本里浏览器端把站点地址写死了，于是这个配置项只对 Host 侧生效——自建配置站的人
-> 改了它，iframe 仍然指向原站，导入还会被一个自己从未配置过的域名拒绝。现在浏览器端从
-> Host 读取，三处一致。
-
-### 缩略图
-
-工作台里的缩略图是二十几个像素见方，而喂给它们的原本是全尺寸原图 —— 一篇文章
-六张配图就是 3 MB。现在 `?thumb=1` 会返回一张 96px 的 JPEG（实测 654 KB → 1.5 KB，
-省 99.8%），在内存里按字节封顶缓存，缓存键含源文件 mtime，因而无需显式失效。
-
-生成依赖 Python 与 Pillow（与图片入库工具同一个 `pythonCommand`）。**拿不到就发
-原图** —— 缩略图是优化不是能力，没装 Pillow 的部署只是慢一点，不会少一块界面。
-
-```yaml
-config:
-  thumbnailCacheBytes: 8388608   # 可选，默认 8 MiB
-```
-
-### 换一个工作台的名字
-
-左边栏那一行默认叫「公众号」。把工作台嵌进更大的产品里时，账号身份往往已经由外面那一层
-承载了，这一行于是该命名一件**事**：
-
-```yaml
-- id: aws-wechat-article
-  name: '@aiworkskills/aws-wechat-article'
-  config:
-    workbenchLabel: 创作素材
-```
-
-留空即插件自己的名字。取不到时也照常显示默认名——这一项是称呼，不是能力。
-
-### 托管部署：把工作台锁在一个工作集上
-
-给每个工作集单独起 Runtime 的托管部署（例如一个用户名下的多个公众号各占一个工作区），
-把该工作集的标识配成 `workspaceId`。插件会把它作为 `workspace` 参数拼进配置站地址：
-
-```yaml
-- id: aws-wechat-article
-  name: '@aiworkskills/aws-wechat-article'
-  config:
-    # 标识由部署方的网关决定，从环境变量注入即可；插件不认识任何具体网关的变量名。
-    workspaceId: !!js process.env.YOUR_GATEWAY_WORKSPACE_ID || ''
-```
-
-
-```text
-https://config.example.com/wechat?embed=dsh&protocol=1&parentOrigin=…&workspace=<工作集 id>
-```
-
-对配置站而言这是一条约束：**当前工作区属于这个工作集**。配置站据此把自己锁在该工作集上，
-而不是让用户在 iframe 里切到别的账号——否则用户切过去再点「应用配置」，另一个账号的设置
-连同发布凭据就会被导入这个工作区。
-
-本机单工作区安装不配这一项，也就不带这个参数，配置站行为与以往完全一致：在那里切换
-账号正是选择「要配哪一个」的方式，去掉反而会把这条路堵死。
-
-插件只陈述事实，怎么处置由配置站决定。
 
 ## 怎么使用
 
@@ -280,6 +167,11 @@ Skill 没有打包在插件源码里。这样插件和 Skill 可以分别更新�
 ![管理文字资料和图片](docs/写作素材面板-素材文字与素材图片管理.png)
 
 写文章时，只要告诉智能体使用哪个内容方向，它就会按照 Skill 的规则读取相关资料，并优先从对应图片中选择正文配图。
+
+## 给部署方
+
+把它接进托管服务、换自己的配置站、锁定 Skill 版本、改工作台的叫法、调缩略图缓存 ——
+都在 **[部署与配置](docs/deployment.md)**。本机自己用不需要看那一页。
 
 ## 与开源生态的关系
 
