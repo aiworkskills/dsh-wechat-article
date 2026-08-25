@@ -1,3 +1,5 @@
+![在对话里写完一篇公众号文章，从选题到微信草稿箱](docs/social-preview.png)
+
 # aws-wechat-article
 
 **在对话里写完一篇公众号文章 —— 从选题一路到微信草稿箱。**

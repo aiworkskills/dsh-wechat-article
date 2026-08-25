@@ -1,0 +1,90 @@
+<!doctype html>
+<!--
+  社交预览图的源文件。改这里，然后重新渲染：
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --hide-scrollbars \
+      --window-size=1280,640 --screenshot=docs/social-preview.png \
+      docs/social-preview.html
+
+  1280×640 是 GitHub「Social preview」的规格，也正好是 Twitter/X
+  summary_large_image 的比例。
+
+  排版按「缩到 600px 宽还要能读」来定：社交卡片实际展示尺寸通常不到原图一半，
+  所以主标题给到 72px、副标题 32px，流程环节 26px —— 再小就只剩色块了。
+  也因此没有放产品截图：界面截图缩到那个尺寸会糊成一团，不如把话说清楚。
+-->
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px; height: 640px; overflow: hidden;
+    background: #0D0D0F;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Heiti SC", system-ui, sans-serif;
+    color: #F5F5F7;
+    display: flex; flex-direction: column;
+    padding: 68px 80px 60px;
+    position: relative;
+  }
+  /* 右上角一团暖光，避免整块纯黑显得死板；很淡，不与文字抢。 */
+  body::after {
+    content: ""; position: absolute; top: -180px; right: -140px;
+    width: 620px; height: 620px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(249,115,22,.18) 0%, rgba(249,115,22,0) 68%);
+  }
+  .brand { font-size: 30px; font-weight: 700; letter-spacing: .5px; }
+  .brand .a { color: #F97316; }
+  .brand .b { color: #F5F5F7; }
+  .brand .c { color: #9A9AA3; }
+
+  .headline {
+    margin-top: auto;
+    font-size: 72px; font-weight: 700; line-height: 1.24; letter-spacing: -1px;
+  }
+  .headline em { font-style: normal; color: #F97316; }
+
+  .sub { margin-top: 22px; font-size: 32px; color: #A8A8B2; line-height: 1.45; }
+
+  .flow { margin-top: 40px; display: flex; align-items: center; gap: 14px; }
+  .step {
+    font-size: 26px; font-weight: 600; color: #E8E8ED;
+    padding: 9px 20px; border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    white-space: nowrap;
+  }
+  .step.last { color: #FFF; background: rgba(249,115,22,.20); border-color: rgba(249,115,22,.45); }
+  .arrow { color: #5A5A63; font-size: 22px; }
+
+  .foot {
+    margin-top: auto; padding-top: 34px;
+    display: flex; align-items: baseline; gap: 18px;
+    font-size: 23px; color: #6E6E78;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .foot .repo { color: #C9C9D1; font-weight: 600; }
+  .foot .dot { color: #3E3E46; }
+</style>
+
+<body>
+  <div class="brand"><span class="a">ai</span><span class="b">work</span><span class="c">skills</span></div>
+
+  <div class="headline">在对话里写完一篇公众号文章<br><em>从选题到微信草稿箱</em></div>
+
+  <div class="sub">方法论来自公开 Skill，文章和素材都在你自己的目录里</div>
+
+  <div class="flow">
+    <span class="step">选题</span><span class="arrow">→</span>
+    <span class="step">写稿</span><span class="arrow">→</span>
+    <span class="step">审稿</span><span class="arrow">→</span>
+    <span class="step">排版</span><span class="arrow">→</span>
+    <span class="step">配图</span><span class="arrow">→</span>
+    <span class="step last">发布</span>
+  </div>
+
+  <div class="foot">
+    <span class="repo">github.com/aiworkskills/dsh-wechat-article</span>
+    <span class="dot">·</span><span>DeepSeek Harness 插件</span>
+    <span class="dot">·</span><span>Apache-2.0</span>
+  </div>
+</body>
