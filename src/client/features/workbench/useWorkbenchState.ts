@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ConfigurationStatus } from '../../../configuration-contract.ts'
-import type { SkillSourceStatus } from '../../../skill-source-contract.ts'
+import type { ConfigurationStatus } from '../../../contracts/configuration.ts'
+import type { SkillSourceStatus } from '../../../contracts/skill-source.ts'
 import { fetchConfigurationStatus } from '../../configuration-status.ts'
 import { fetchSkillSourceStatus, synchronizeSkillSource } from '../../skill-source-status.ts'
 

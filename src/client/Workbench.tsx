@@ -12,7 +12,7 @@ import {
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import { configurationImportPrompt } from './prompts.ts'
-import type { ConfigurationEmbedInfo } from '../configuration-contract.ts'
+import type { ConfigurationEmbedInfo } from '../contracts/configuration.ts'
 import {
   configurationEmbedUrl,
   configurationOrigin,

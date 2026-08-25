@@ -1,4 +1,4 @@
-import { CONFIGURATION_EMBED_ROUTE, type ConfigurationEmbedInfo } from '../configuration-contract.ts'
+import { CONFIGURATION_EMBED_ROUTE, type ConfigurationEmbedInfo } from '../contracts/configuration.ts'
 
 export const CONFIGURATION_PROTOCOL = 1
 export const CONFIGURATION_MESSAGE_SOURCE = 'aiworkskills-config'

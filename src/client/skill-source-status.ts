@@ -1,4 +1,4 @@
-import { SKILL_SOURCE_ROUTE, type SkillSourceStatus } from '../skill-source-contract.ts'
+import { SKILL_SOURCE_ROUTE, type SkillSourceStatus } from '../contracts/skill-source.ts'
 
 function isStatus(value: unknown): value is SkillSourceStatus {
   if (typeof value !== 'object' || value === null) return false

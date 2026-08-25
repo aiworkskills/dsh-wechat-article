@@ -1,4 +1,4 @@
-import type { ArticleFileSummary } from '../../../project-contract.ts'
+import type { ArticleFileSummary } from '../../../contracts/project.ts'
 import { articleFileUrl } from '../../project-snapshot.ts'
 import { MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
 import { filename } from './format.ts'

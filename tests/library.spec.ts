@@ -12,7 +12,7 @@ import type {
   SubprocessTerminalHandle,
   SubprocessTerminalSpawnSpec,
 } from '@deepseek-ai/dsh-subprocess'
-import WechatProductLibrary from '../src/library.js'
+import WechatProductLibrary from '../src/host/library.js'
 
 class StubSubprocess extends SubprocessRuntime {
   lastSpec: SubprocessSpawnSpec | undefined

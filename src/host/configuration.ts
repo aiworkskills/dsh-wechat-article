@@ -5,11 +5,11 @@ import { Context, Service } from '@deepseek-ai/cordis'
 import '@deepseek-ai/dsh-subprocess'
 import z from '@deepseek-ai/schemastery'
 import { parse } from 'yaml'
-import type { ConfigurationStatus } from './configuration-contract.ts'
-import { CONFIG_RELATIVE, ENV_RELATIVE, resolveWorkspace } from './domain/paths/workspace-paths.ts'
-import { resolveSkillSourceDir, skillScript, validateSkillSource } from './skill-source.ts'
+import type { ConfigurationStatus } from '../contracts/configuration.ts'
+import { CONFIG_RELATIVE, ENV_RELATIVE, resolveWorkspace } from '../domain/paths/workspace-paths.ts'
+import { resolveSkillSourceDir, skillScript, validateSkillSource } from './skill-source-dir.ts'
 
-export type { ConfigurationState, ConfigurationStatus } from './configuration-contract.ts'
+export type { ConfigurationState, ConfigurationStatus } from '../contracts/configuration.ts'
 
 const CONFIG_PATH = CONFIG_RELATIVE
 const ENV_PATH = ENV_RELATIVE

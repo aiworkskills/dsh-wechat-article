@@ -1,4 +1,4 @@
-import type { ArticleStage, ArticleSummary } from '../../project-contract.ts'
+import type { ArticleStage, ArticleSummary } from '../../contracts/project.ts'
 
 export interface ArticleArtifacts {
   readonly published: boolean

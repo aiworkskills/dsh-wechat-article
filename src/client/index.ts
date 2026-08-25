@@ -3,6 +3,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { ClientSessionContext, InputTriggerServiceContract, InputTriggerSource } from '@deepseek-ai/dsh-client-ui-input-trigger/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import { WORKBENCH_DETAILS_PRIORITY } from '../contracts/workbench.ts'
 import { SidebarAction } from './SidebarAction.tsx'
 import { Workbench } from './Workbench.tsx'
 import { createWorkbenchPanelController } from './panel-controller.ts'
@@ -54,7 +55,7 @@ export function apply(ctx: ClientContext): void {
   let panel = createWorkbenchPanelController({
     mount: () => ctx.slots.inject('details', () => ctx.slots.register({
       name: 'details',
-      priority: -10,
+      priority: WORKBENCH_DETAILS_PRIORITY,
       inject: () => ({
         onClose: panel.close,
         openConfigurationFolder: async (cwd: string) => {

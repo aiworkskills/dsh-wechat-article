@@ -2,10 +2,9 @@ import type { Context } from '@deepseek-ai/cordis'
 import { createReadStream } from 'node:fs'
 import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { mapRouteError } from '../../../domain/errors.ts'
-import { resolveProductDocumentPath, resolveProductImagePath } from '../../../domain/paths/workspace-paths.ts'
-import { PRODUCT_CATEGORY_ROUTE, PRODUCT_DOCUMENT_ROUTE, PRODUCT_IMAGE_INGEST_ROUTE, PRODUCT_IMAGE_ROUTE } from '../../../project-contract.ts'
-import { imageContentType, imagePayload, readJson, requireSameOrigin, sendJson, textField } from './shared/http.ts'
+import { resolveProductDocumentPath, resolveProductImagePath } from '../../domain/paths/workspace-paths.ts'
+import { PRODUCT_CATEGORY_ROUTE, PRODUCT_DOCUMENT_ROUTE, PRODUCT_IMAGE_INGEST_ROUTE, PRODUCT_IMAGE_ROUTE } from '../../contracts/project.ts'
+import { imageContentType, imagePayload, mapRouteError, readJson, requireSameOrigin, sendJson, textField } from './shared/http.ts'
 import { sessionWorkspace } from './shared/session.ts'
 
 export function registerMaterialRoutes(ctx: Context): () => void {
@@ -55,7 +54,7 @@ export function registerMaterialRoutes(ctx: Context): () => void {
         }
         const workspace = sessionWorkspace(ctx, req, PRODUCT_IMAGE_ROUTE)
         const path = new URL(req.url ?? PRODUCT_IMAGE_ROUTE, 'http://localhost').searchParams.get('path')
-        const resolved = workspace === undefined || path === null ? null : resolveProductImagePath(workspace, path)
+        const resolved = workspace === undefined || path === null ? null : await resolveProductImagePath(workspace, path)
         const contentType = resolved === null ? undefined : imageContentType(resolved)
         if (resolved === null || contentType === undefined) {
           sendJson(res, 404, { error: 'image-not-found' })
@@ -81,7 +80,7 @@ export function registerMaterialRoutes(ctx: Context): () => void {
         if (req.method === 'GET') {
           const workspace = sessionWorkspace(ctx, req, PRODUCT_DOCUMENT_ROUTE)
           const path = new URL(req.url ?? PRODUCT_DOCUMENT_ROUTE, 'http://localhost').searchParams.get('path')
-          const resolved = workspace === undefined || path === null ? null : resolveProductDocumentPath(workspace, path)
+          const resolved = workspace === undefined || path === null ? null : await resolveProductDocumentPath(workspace, path)
           if (resolved === null) {
             sendJson(res, 404, { error: 'product-document-not-found' })
             return

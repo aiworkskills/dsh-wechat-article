@@ -1,7 +1,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type { ToolDefinition } from '@deepseek-ai/dsh-tools'
 import { describe, expect, it } from 'vitest'
-import { apply } from '../src/tools.js'
+import { apply } from '../src/host/tools.js'
 
 describe('product-library tool consumer', () => {
   it('registers four focused tools and preserves the cover-image restriction', () => {

@@ -1,6 +1,23 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { extname } from 'node:path'
-import { UserInputError } from '../../../../domain/errors.ts'
+import { UserInputError } from '../../../domain/errors.ts'
+
+export interface RouteErrorBody {
+  readonly error: string
+  readonly message?: string
+}
+
+/**
+ * Map a thrown error to an HTTP status and JSON body for route handlers.
+ *
+ * 只有 `UserInputError` 是 400。其余一律 500 —— 写文件 EACCES、磁盘满、YAML 解析
+ * 崩，都是服务端的问题，报成 400 等于告诉用户「是你填错了」，于是他会去改一个
+ * 本来没错的输入。
+ */
+export function mapRouteError(error: unknown, fallbackCode: string): { readonly status: number; readonly body: RouteErrorBody } {
+  const message = error instanceof Error ? error.message : String(error)
+  return { status: error instanceof UserInputError ? 400 : 500, body: { error: fallbackCode, message } }
+}
 
 export function sendJson(res: ServerResponse, status: number, value: unknown): void {
   const body = JSON.stringify(value)

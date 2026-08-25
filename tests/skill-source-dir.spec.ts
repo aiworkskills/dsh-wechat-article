@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
-import { resolveSkillSourceDir } from '../src/skill-source.js'
+import { resolveSkillSourceDir } from '../src/host/skill-source-dir.js'
 
 describe('Skill 检出位置', () => {
   it('默认放在 DSH_HOME 下，由插件按需 clone', () => {

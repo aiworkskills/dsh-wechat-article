@@ -2,8 +2,8 @@ import { mkdir, mkdtemp, rm, utimes, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { WechatProductLibrary } from '../src/library.js'
-import { projectSnapshot } from '../src/project-snapshot.js'
+import type { WechatProductLibrary } from '../src/host/library.js'
+import { projectSnapshot } from '../src/domain/project/snapshot.js'
 
 const roots: string[] = []
 

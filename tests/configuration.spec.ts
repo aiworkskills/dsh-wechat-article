@@ -11,8 +11,8 @@ import type {
   SubprocessSpawnSpec,
   SubprocessTerminalHandle,
 } from '@deepseek-ai/dsh-subprocess'
-import WechatArticleConfiguration from '../src/configuration.js'
-import { resolveSkillSourceDir, WECHAT_SKILL_NAMES } from '../src/skill-source.js'
+import WechatArticleConfiguration from '../src/host/configuration.js'
+import { resolveSkillSourceDir, WECHAT_SKILL_NAMES } from '../src/host/skill-source-dir.js'
 
 class StubSubprocess extends SubprocessRuntime {
   exitCode = 0

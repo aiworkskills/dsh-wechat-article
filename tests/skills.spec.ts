@@ -11,8 +11,8 @@ import {
   type SubprocessSpawnSpec,
   type SubprocessTerminalHandle,
 } from '@deepseek-ai/dsh-subprocess'
-import * as skillsPlugin from '../src/skills.js'
-import { resolveSkillSourceDir, WECHAT_SKILL_NAMES } from '../src/skill-source.js'
+import * as skillsPlugin from '../src/host/skills.js'
+import { resolveSkillSourceDir, WECHAT_SKILL_NAMES } from '../src/host/skill-source-dir.js'
 
 const temporaryRoots: string[] = []
 const originalDshHome = process.env.DSH_HOME

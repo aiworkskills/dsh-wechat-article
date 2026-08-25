@@ -2,7 +2,7 @@ import { Context } from '@deepseek-ai/cordis'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import { CommandId, CommandRuntime } from '@deepseek-ai/dsh-commands'
 import { describe, expect, it } from 'vitest'
-import * as commandsPlugin from '../src/commands.js'
+import * as commandsPlugin from '../src/host/commands.js'
 
 describe('wechat commands', () => {
   it('registers discovery commands that link to the deployed configuration site', async () => {

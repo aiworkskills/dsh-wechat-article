@@ -2,10 +2,10 @@
 import { Context, Service } from '@deepseek-ai/cordis'
 import '@deepseek-ai/dsh-subprocess'
 import z from '@deepseek-ai/schemastery'
-import * as mutations from './domain/library/mutations.ts'
-import { findDocuments, findImages, listProducts } from './domain/library/query.ts'
-import { resolveWorkspace } from './domain/paths/workspace-paths.ts'
-import { resolveSkillSourceDir, skillScript } from './skill-source.ts'
+import * as mutations from '../domain/library/mutations.ts'
+import { findDocuments, findImages, listProducts } from '../domain/library/query.ts'
+import { resolveWorkspace } from '../domain/paths/workspace-paths.ts'
+import { resolveSkillSourceDir, skillScript } from './skill-source-dir.ts'
 
 /** Deployment configuration for product-library reads and image ingestion. */
 export interface Config {
@@ -27,7 +27,7 @@ export type {
   ProductDocument,
   ProductImage,
   ProductSummary,
-} from './domain/library/query.ts'
+} from '../domain/library/query.ts'
 
 export type {
   ProductCategoryCreateRequest,
@@ -36,7 +36,7 @@ export type {
   ProductDocumentWriteRequest,
   ProductFileDeleteRequest,
   ProductImageRenameRequest,
-} from './domain/library/mutations.ts'
+} from '../domain/library/mutations.ts'
 
 /** Request passed to the original Skill's image-ingest script. */
 export interface ImageIngestRequest {

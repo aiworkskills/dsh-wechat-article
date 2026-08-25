@@ -1,8 +1,7 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import * as root from '../src/index.js'
 import * as contracts from '../src/contracts.js'
-import * as library from '../src/library.js'
-import * as configurationRoute from '../src/configuration-route.js'
 
 describe('public package API', () => {
   it('exposes the unified root entry surface', () => {
@@ -18,12 +17,17 @@ describe('public package API', () => {
     expect(contracts.CONFIGURATION_STATUS_ROUTE).toBe('/plugins/aiworkskills/wechat-article/configuration-status')
     expect(contracts.PROJECT_SNAPSHOT_ROUTE).toBe('/plugins/aiworkskills/wechat-article/project-snapshot')
     expect(contracts.SKILL_SOURCE_ROUTE).toBe('/plugins/aiworkskills/wechat-article/skill-source')
+    expect(contracts.WORKBENCH_DETAILS_PRIORITY).toBe(-10)
   })
 
-  it('keeps Cordis plugin surfaces on their dedicated entries', () => {
-    expect(library.WechatProductLibrary).toBeTypeOf('function')
-    expect(typeof configurationRoute.apply).toBe('function')
-    expect(configurationRoute.name).toBe('aiworkskills-wechat-configuration-route')
-    expect(configurationRoute.PROJECT_EVENTS_ROUTE).toBe('/plugins/aiworkskills/wechat-article/project-events')
+  it('publishes exactly three code entry points', () => {
+    // 每个子路径都是一条永久承诺。曾经有十条，其中八条从来没有第二个消费者 ——
+    // 内部模块一旦挂上 exports，改名就成了破坏性变更。
+    const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+      readonly exports: Record<string, unknown>
+    }
+    expect(Object.keys(manifest.exports)).toEqual([
+      '.', './contracts', './client', './cordis.patch.yml', './package.json',
+    ])
   })
 })

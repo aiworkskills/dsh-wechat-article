@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { ProductDocumentSummary, ProductImageSummary, ProjectSnapshot } from '../../../project-contract.ts'
+import type { ProductDocumentSummary, ProductImageSummary, ProjectSnapshot } from '../../../contracts/project.ts'
 import {
   createProductCategory,
   createProductDocument,

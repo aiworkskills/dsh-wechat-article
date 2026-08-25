@@ -1,7 +1,7 @@
 import { watch, type FSWatcher } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
-import { resolveDraftRoot } from './project-snapshot.ts'
+import { resolveDraftRoot } from './snapshot.ts'
 
 interface WatchTarget {
   readonly path: string

@@ -4,18 +4,18 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { registerConfigurationRoutes } from '../src/adapters/host/routes/configuration-routes.ts'
-import { registerProjectRoutes } from '../src/adapters/host/routes/project-routes.ts'
-import { CONFIGURATION_EMBED_ROUTE, CONFIGURATION_STATUS_ROUTE } from '../src/configuration-contract.ts'
-import { PROJECT_SNAPSHOT_ROUTE } from '../src/project-contract.ts'
-import type { ConfigurationStatus } from '../src/configuration-contract.ts'
+import { registerConfigurationRoutes, type ConfigurationRouteOptions } from '../src/host/routes/configuration.ts'
+import { registerProjectRoutes } from '../src/host/routes/project.ts'
+import { CONFIGURATION_EMBED_ROUTE, CONFIGURATION_STATUS_ROUTE } from '../src/contracts/configuration.ts'
+import { PROJECT_SNAPSHOT_ROUTE } from '../src/contracts/project.ts'
+import type { ConfigurationStatus } from '../src/contracts/configuration.ts'
 
 const SITE = 'https://aiworkskills.cn/config'
 
 const roots: string[] = []
 
 /** Drive the embed route and return its parsed body. */
-async function embedInfo(options: { readonly configurationUrl: string }): Promise<Record<string, unknown>> {
+async function embedInfo(options: ConfigurationRouteOptions): Promise<Record<string, unknown>> {
   const registry = createRouteRegistry()
   registerConfigurationRoutes({ webServer: { register: registry.register } } as unknown as Context, options)
   const handler = registry.routes.get(CONFIGURATION_EMBED_ROUTE)!
@@ -112,25 +112,15 @@ describe('workbench routes', () => {
     expect(body).toEqual({ configurationUrl: 'https://config.acme.internal/wechat' })
   })
 
-  it('reports the working set only when the Gateway confined this Runtime to one', async () => {
-    // Set by a Runtime Gateway that gives each working set its own Runtime. A
-    // plain local install has no such variable, and the missing field is what
-    // tells the configuration site nothing is being constrained.
-    const previous = process.env.DSHSERVER_WORKSPACE_ID
-    try {
-      delete process.env.DSHSERVER_WORKSPACE_ID
-      expect('workspaceId' in await embedInfo({ configurationUrl: SITE })).toBe(false)
-
-      process.env.DSHSERVER_WORKSPACE_ID = 'acct-7'
-      expect(await embedInfo({ configurationUrl: SITE })).toMatchObject({ workspaceId: 'acct-7' })
-
-      // Empty means "no second axis", not a working set named ''.
-      process.env.DSHSERVER_WORKSPACE_ID = '  '
-      expect('workspaceId' in await embedInfo({ configurationUrl: SITE })).toBe(false)
-    } finally {
-      if (previous === undefined) delete process.env.DSHSERVER_WORKSPACE_ID
-      else process.env.DSHSERVER_WORKSPACE_ID = previous
-    }
+  it('reports the working set only when the deployment confined this Runtime to one', async () => {
+    // 从配置项来，不从环境变量来。它曾经直接读 DSHSERVER_WORKSPACE_ID —— 一个属于
+    // 某个具体网关实现的名字。这个用例当时得存下再恢复一个全局变量才能跑，那本身
+    // 就是接缝缺失的症状。
+    expect('workspaceId' in await embedInfo({ configurationUrl: SITE })).toBe(false)
+    expect(await embedInfo({ configurationUrl: SITE, workspaceId: 'acct-7' }))
+      .toMatchObject({ workspaceId: 'acct-7' })
+    // Empty means "no second axis", not a working set named ''.
+    expect('workspaceId' in await embedInfo({ configurationUrl: SITE, workspaceId: '  ' })).toBe(false)
   })
 
   it('returns project snapshot for a configured workspace', async () => {

@@ -34,7 +34,7 @@ export interface ConfigurationEmbedInfo {
 
   /**
    * Which working set this Runtime serves, when the deployment gives each one
-   * its own Runtime (`DSHSERVER_WORKSPACE_ID`).
+   * its own Runtime.
    *
    * Absent for the ordinary single-workspace install, and the configuration site
    * is expected to behave as it always has in that case. When present it is a

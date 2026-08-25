@@ -1,6 +1,6 @@
 import type { Context } from '@deepseek-ai/cordis'
-import { SKILL_SOURCE_ROUTE } from '../../../skill-source-contract.ts'
-import { sendJson } from './shared/http.ts'
+import { SKILL_SOURCE_ROUTE } from '../../contracts/skill-source.ts'
+import { requireSameOrigin, sendJson } from './shared/http.ts'
 
 export function registerSkillSourceRoutes(ctx: Context): () => void {
   return ctx.webServer.register({
@@ -16,9 +16,7 @@ export function registerSkillSourceRoutes(ctx: Context): () => void {
         sendJson(res, 405, { error: 'method-not-allowed' })
         return
       }
-      const origin = req.headers.origin
-      const host = req.headers.host
-      if (origin !== undefined && (host === undefined || new URL(origin).host !== host)) {
+      if (!requireSameOrigin(req)) {
         sendJson(res, 403, { error: 'cross-origin-install-rejected' })
         return
       }

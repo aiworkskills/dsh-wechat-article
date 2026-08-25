@@ -1,12 +1,18 @@
-/** Unified Cordis entry point for the WeChat article workspace. */
+/**
+ * Unified Cordis entry point for the WeChat article workspace.
+ *
+ * 这是 Host 平面唯一的组合根：解析部署输入，装配三个服务，再挂上路由、工具、
+ * 命令与 Skill 提供者。所有部署事实都从 `Config` 进来，插件不去读环境变量 ——
+ * 那样才能既在单机安装下有一套能用的默认值，又让托管部署完整地说了算。
+ */
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { apply as registerCommands } from './commands.ts'
-import { WechatArticleConfiguration } from './configuration.ts'
-import { apply as registerRoutes } from './configuration-route.ts'
-import { WechatProductLibrary } from './library.ts'
-import { apply as registerSkills } from './skills.ts'
-import { apply as registerTools } from './tools.ts'
+import { apply as registerCommands } from './host/commands.ts'
+import { WechatArticleConfiguration } from './host/configuration.ts'
+import { WechatProductLibrary } from './host/library.ts'
+import { apply as registerRoutes } from './host/routes/index.ts'
+import { apply as registerSkills } from './host/skills.ts'
+import { apply as registerTools } from './host/tools.ts'
 
 export interface Config {
   readonly gitCommand?: string
@@ -16,6 +22,17 @@ export interface Config {
   readonly configurationUrl?: string
   /** 预置的 Skill 检出目录；留空则用 DSH_HOME 下的默认位置并按需 clone。 */
   readonly skillSourceDir?: string
+  /**
+   * 本 Runtime 服务于哪一个工作集（例如某一个公众号）。
+   *
+   * 留空是普通的单工作区安装，配置站照常自由切换。有值时它是一条约束：本工作区
+   * 属于那个工作集，于是内嵌的配置站不应再让用户漫游到别的账号 —— 那会把另一个
+   * 账号的设置和发布凭据带进这个工作区。
+   *
+   * 每个工作集一个 Runtime 的部署，在 profile 里把自己的标识注进来即可；插件不需要
+   * 知道那个标识来自哪个网关、叫什么环境变量。
+   */
+  readonly workspaceId?: string
 }
 
 export const Config: z<Config> = z.object({
@@ -25,6 +42,7 @@ export const Config: z<Config> = z.object({
   maxResults: z.number().default(50),
   configurationUrl: z.string().default('https://aiworkskills.cn/config'),
   skillSourceDir: z.string().default(''),
+  workspaceId: z.string().default(''),
 })
 
 export const name = 'aws-wechat-article'
@@ -38,6 +56,7 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
   const maxResults = config.maxResults ?? 50
   const configurationUrl = config.configurationUrl ?? 'https://aiworkskills.cn/config'
   const skillSourceDir = config.skillSourceDir ?? ''
+  const workspaceId = config.workspaceId?.trim() ?? ''
   new WechatProductLibrary(ctx, {
     pythonCommand,
     maxDocumentBytes,
@@ -46,7 +65,10 @@ export async function apply(ctx: Context, config: Config = {}): Promise<void> {
   })
   new WechatArticleConfiguration(ctx, { pythonCommand, skillSourceDir })
   await registerSkills(ctx, { gitCommand, skillSourceDir })
-  registerRoutes(ctx, { configurationUrl })
+  registerRoutes(ctx, {
+    configurationUrl,
+    ...(workspaceId === '' ? {} : { workspaceId }),
+  })
   registerTools(ctx)
   registerCommands(ctx, { configurationUrl })
 }
@@ -58,8 +80,8 @@ export {
   type ProductDocument,
   type ProductImage,
   type ProductSummary,
-} from './library.ts'
+} from './host/library.ts'
 
-export { WechatArticleConfiguration } from './configuration.ts'
+export { WechatArticleConfiguration } from './host/configuration.ts'
 
-export type { ConfigurationState, ConfigurationStatus } from './configuration-contract.ts'
+export type { ConfigurationState, ConfigurationStatus } from './contracts/configuration.ts'

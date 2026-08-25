@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, IconFolderClose16, IconFolderOpenOutline16, IconLinkOutline16, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { ArticleFileSummary, ProjectSnapshot } from '../../../project-contract.ts'
+import type { ArticleFileSummary, ProjectSnapshot } from '../../../contracts/project.ts'
 import { articleFileUrl, fetchArticleFile } from '../../project-snapshot.ts'
 import { ArticlePreview, type Preview } from './ArticlePreview.tsx'
 import { articleTime, filename } from './format.ts'

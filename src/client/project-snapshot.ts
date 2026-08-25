@@ -1,4 +1,4 @@
-import { ARTICLE_FILE_ROUTE, PRODUCT_CATEGORY_ROUTE, PRODUCT_DOCUMENT_ROUTE, PRODUCT_IMAGE_INGEST_ROUTE, PRODUCT_IMAGE_ROUTE, PROJECT_EVENTS_ROUTE, PROJECT_SNAPSHOT_ROUTE, type ProjectSnapshot } from '../project-contract.ts'
+import { ARTICLE_FILE_ROUTE, PRODUCT_CATEGORY_ROUTE, PRODUCT_DOCUMENT_ROUTE, PRODUCT_IMAGE_INGEST_ROUTE, PRODUCT_IMAGE_ROUTE, PROJECT_EVENTS_ROUTE, PROJECT_SNAPSHOT_ROUTE, type ProjectSnapshot } from '../contracts/project.ts'
 
 function isSnapshot(value: unknown): value is ProjectSnapshot {
   if (typeof value !== 'object' || value === null) return false

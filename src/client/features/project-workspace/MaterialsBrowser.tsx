@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { InputHTMLAttributes } from 'react'
 import { Button, IconBrowseOutline16, IconCheckOutline16, IconCloseOutline16, IconFolderClose16, IconFolderOpenOutline16, IconPaperclipOutline16, IconPlusOutline16, IconTrashOutline16, MarkdownText, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { ProductDocumentSummary, ProductImageSummary, ProjectSnapshot } from '../../../project-contract.ts'
+import type { ProductDocumentSummary, ProductImageSummary, ProjectSnapshot } from '../../../contracts/project.ts'
 import { fetchProductDocument, productImageUrl } from '../../project-snapshot.ts'
 import type { Preview } from './ArticlePreview.tsx'
 import { filename } from './format.ts'

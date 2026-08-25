@@ -1,17 +1,9 @@
-/** User-facing input or validation failure. Maps to HTTP 400. */
+/**
+ * User-facing input or validation failure.
+ *
+ * 它存在的意义就是把「用户填错了」和「服务端出问题了」分开。HTTP 状态码由
+ * 路由层的 `mapRouteError` 决定 —— 领域层不该知道有 HTTP 这回事。
+ */
 export class UserInputError extends Error {
   override readonly name = 'UserInputError'
-}
-
-export interface RouteErrorBody {
-  readonly error: string
-  readonly message?: string
-}
-
-/** Map a thrown error to an HTTP status and JSON body for route handlers. */
-export function mapRouteError(error: unknown, fallbackCode: string): { readonly status: number; readonly body: RouteErrorBody } {
-  if (error instanceof UserInputError) {
-    return { status: 400, body: { error: fallbackCode, message: error.message } }
-  }
-  return { status: 400, body: { error: fallbackCode, message: error instanceof Error ? error.message : String(error) } }
 }

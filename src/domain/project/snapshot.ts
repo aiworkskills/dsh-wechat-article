@@ -1,10 +1,24 @@
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { extname, isAbsolute, join, resolve, sep } from 'node:path'
 import { parse } from 'yaml'
-import { deriveArticleStage, stageLabels } from './domain/project/article-stage.ts'
-import { resolveWorkspace, toRelativePath } from './domain/paths/workspace-paths.ts'
-import type { ArticleFileKind, ArticleFileSummary, ArticleSummary, ProjectSnapshot } from './project-contract.ts'
-import type { WechatProductLibrary } from './library.ts'
+import { deriveArticleStage, stageLabels } from './article-stage.ts'
+import { confineToRoot, resolveWorkspace, toRelativePath } from '../paths/workspace-paths.ts'
+import type { ArticleFileKind, ArticleFileSummary, ArticleSummary, ProjectSnapshot } from '../../contracts/project.ts'
+import type { ProductDocument, ProductImage, ProductSummary } from '../library/query.ts'
+
+/**
+ * 快照需要产品库的哪三件事。
+ *
+ * 声明成接口而不是 `import type { WechatProductLibrary }`：那个类是 Host 平面的
+ * Cordis 服务，domain 反过来引用它就把依赖方向倒了过来 —— 纯逻辑从此只能跟着
+ * 服务实现一起改。这里只说出用到的三个方法，服务满不满足由 TypeScript 的结构化
+ * 类型在调用点回答。
+ */
+export interface ProductLibraryReader {
+  listProducts(workspace: string): Promise<readonly ProductSummary[]>
+  findDocuments(workspace: string): Promise<readonly ProductDocument[]>
+  findImages(workspace: string): Promise<readonly ProductImage[]>
+}
 
 const ARTICLE_LIMIT_BYTES = 2 * 1024 * 1024
 const COVER_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp']
@@ -141,7 +155,7 @@ async function inspectArticle(workspace: string, root: string, directory: string
   }
 }
 
-export async function projectSnapshot(workspaceInput: string, library: WechatProductLibrary): Promise<ProjectSnapshot> {
+export async function projectSnapshot(workspaceInput: string, library: ProductLibraryReader): Promise<ProjectSnapshot> {
   const workspace = resolveWorkspace(workspaceInput)
   const root = await resolveDraftRoot(workspace)
   const articles = (await Promise.all((await directories(root)).map(directory => inspectArticle(workspace, root, directory))))
@@ -172,7 +186,5 @@ export async function projectSnapshot(workspaceInput: string, library: WechatPro
 
 export async function resolveArticleFile(workspaceInput: string, path: string): Promise<string | null> {
   const workspace = resolveWorkspace(workspaceInput)
-  const root = await resolveDraftRoot(workspace)
-  const candidate = resolve(workspace, path)
-  return candidate.startsWith(`${root}${sep}`) ? candidate : null
+  return confineToRoot(await resolveDraftRoot(workspace), resolve(workspace, path))
 }

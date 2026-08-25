@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { watchProjectWorkspace } from '../src/project-events.js'
+import { watchProjectWorkspace } from '../src/domain/project/watch.js'
 
 const roots: string[] = []
 

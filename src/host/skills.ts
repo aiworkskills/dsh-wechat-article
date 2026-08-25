@@ -3,8 +3,8 @@ import { join } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import * as filesystemSkills from '@deepseek-ai/dsh-skill-filesystem'
 import z from '@deepseek-ai/schemastery'
-import { resolveSkillSourceDir } from './skill-source.ts'
-import { WechatSkillSource } from './skill-source-service.ts'
+import { resolveSkillSourceDir } from './skill-source-dir.ts'
+import { WechatSkillSource } from './skill-source.ts'
 
 const PROVIDER_NAME = 'aiworkskills-wechat-article-git'
 

@@ -15,30 +15,6 @@
       "types": "./lib/types/contracts.d.ts",
       "default": "./lib/contracts.js"
     },
-    "./skills": {
-      "types": "./lib/types/skills.d.ts",
-      "default": "./lib/skills.js"
-    },
-    "./library": {
-      "types": "./lib/types/library.d.ts",
-      "default": "./lib/library.js"
-    },
-    "./configuration": {
-      "types": "./lib/types/configuration.d.ts",
-      "default": "./lib/configuration.js"
-    },
-    "./configuration-route": {
-      "types": "./lib/types/configuration-route.d.ts",
-      "default": "./lib/configuration-route.js"
-    },
-    "./tools": {
-      "types": "./lib/types/tools.d.ts",
-      "default": "./lib/tools.js"
-    },
-    "./commands": {
-      "types": "./lib/types/commands.d.ts",
-      "default": "./lib/commands.js"
-    },
     "./client": {
       "types": "./lib/types/client/index.d.ts",
       "default": "./lib/client.js"

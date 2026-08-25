@@ -6,7 +6,7 @@ export {
   type ConfigurationEmbedInfo,
   type ConfigurationState,
   type ConfigurationStatus,
-} from './configuration-contract.ts'
+} from './contracts/configuration.ts'
 
 export {
   ARTICLE_FILE_ROUTE,
@@ -23,10 +23,12 @@ export {
   type ProductDocumentSummary,
   type ProductImageSummary,
   type ProjectSnapshot,
-} from './project-contract.ts'
+} from './contracts/project.ts'
 
 export {
   SKILL_SOURCE_ROUTE,
   type SkillSourceState,
   type SkillSourceStatus,
-} from './skill-source-contract.ts'
+} from './contracts/skill-source.ts'
+
+export { WORKBENCH_DETAILS_PRIORITY } from './contracts/workbench.ts'

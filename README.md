@@ -138,8 +138,16 @@ Skill 版本随之固定，启动不再依赖网络。内网隔离环境、企�
 ### 托管部署：把工作台锁在一个工作集上
 
 给每个工作集单独起 Runtime 的托管部署（例如一个用户名下的多个公众号各占一个工作区），
-应通过 Runtime Gateway 设置 `DSHSERVER_WORKSPACE_ID`。插件会把它作为 `workspace`
-参数拼进配置站地址：
+把该工作集的标识配成 `workspaceId`。插件会把它作为 `workspace` 参数拼进配置站地址：
+
+```yaml
+- id: aws-wechat-article
+  name: '@aiworkskills/aws-wechat-article'
+  config:
+    # 标识由部署方的网关决定，从环境变量注入即可；插件不认识任何具体网关的变量名。
+    workspaceId: !!js process.env.YOUR_GATEWAY_WORKSPACE_ID || ''
+```
+
 
 ```text
 https://config.example.com/wechat?embed=dsh&protocol=1&parentOrigin=…&workspace=<工作集 id>
@@ -149,7 +157,7 @@ https://config.example.com/wechat?embed=dsh&protocol=1&parentOrigin=…&workspac
 而不是让用户在 iframe 里切到别的账号——否则用户切过去再点「应用配置」，另一个账号的设置
 连同发布凭据就会被导入这个工作区。
 
-本机单工作区安装不设置这个变量，也就不带这个参数，配置站行为与以往完全一致：在那里切换
+本机单工作区安装不配这一项，也就不带这个参数，配置站行为与以往完全一致：在那里切换
 账号正是选择「要配哪一个」的方式，去掉反而会把这条路堵死。
 
 插件只陈述事实，怎么处置由配置站决定。

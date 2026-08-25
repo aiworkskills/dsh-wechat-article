@@ -1,4 +1,4 @@
-import { CONFIGURATION_STATUS_ROUTE, type ConfigurationStatus } from '../configuration-contract.ts'
+import { CONFIGURATION_STATUS_ROUTE, type ConfigurationStatus } from '../contracts/configuration.ts'
 
 function isStatus(value: unknown): value is ConfigurationStatus {
   if (typeof value !== 'object' || value === null) return false

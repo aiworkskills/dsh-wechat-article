@@ -2,13 +2,13 @@ import { mkdir, mkdtemp, rename, rm, stat } from 'node:fs/promises'
 import { basename, dirname } from 'node:path'
 import { Context, Service } from '@deepseek-ai/cordis'
 import '@deepseek-ai/dsh-subprocess'
-import type { SkillSourceStatus } from './skill-source-contract.ts'
+import type { SkillSourceStatus } from '../contracts/skill-source.ts'
 import {
   SKILL_REPOSITORY,
   SKILL_REPOSITORY_REF,
   resolveSkillSourceDir,
   validateSkillSource,
-} from './skill-source.ts'
+} from './skill-source-dir.ts'
 
 async function exists(path: string): Promise<boolean> {
   try {
