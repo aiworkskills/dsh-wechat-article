@@ -4,6 +4,27 @@
   "description": "DeepSeek Harness bundle for the aiworkskills WeChat article workflow",
   "type": "module",
   "license": "Apache-2.0",
+  "author": "AI Work Skills",
+  "homepage": "https://github.com/aiworkskills/dsh-wechat-article#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aiworkskills/dsh-wechat-article.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aiworkskills/dsh-wechat-article/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "cordis",
+    "wechat",
+    "wechat-official-account",
+    "content-writing",
+    "ai-agent"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./lib/index.js",
   "types": "./lib/types/index.d.ts",
   "exports": {
