@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, IconFolderClose16, IconFolderOpenOutline16, IconLinkOutline16, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, IconFolderCloseRegular, IconFolderOpenOutlineRegular, IconLinkOutlineRegular, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ArticleFileSummary, ProjectSnapshot } from '../../../contracts/project.ts'
 import { articleFileUrl, fetchArticleFile } from '../../project-snapshot.ts'
 import { ArticlePreview, type Preview } from './ArticlePreview.tsx'
@@ -42,8 +42,8 @@ export function ArticleBrowser({
       : <div className={css.articleFolders}>{snapshot.articles.map((article, index) => <details className={css.articleFolder} open={index === 0} key={article.path}>
         <summary className={css.articleFolderHeader}>
           <span className={css.materialFolderIdentity}>
-            <span className={css.closedFolderIcon}><IconFolderClose16 /></span>
-            <span className={css.openFolderIcon}><IconFolderOpenOutline16 /></span>
+            <span className={css.closedFolderIcon}><IconFolderCloseRegular /></span>
+            <span className={css.openFolderIcon}><IconFolderOpenOutlineRegular /></span>
             <span><strong>{article.title}</strong><small>{article.stageLabel} · {articleTime(article.updatedAt)}</small></span>
           </span>
         </summary>
@@ -57,11 +57,11 @@ export function ArticleBrowser({
             <span><strong>{filename(file.path)}</strong><small>{file.label}</small></span>
           </button>
           <Tooltip label="引用到主对话" side="top">
-            <button className={css.compactIconButton} type="button" aria-label={`引用 ${filename(file.path)} 到主对话`} onClick={() => { onReferenceFile(file.path) }}><IconLinkOutline16 /></button>
+            <button className={css.compactIconButton} type="button" aria-label={`引用 ${filename(file.path)} 到主对话`} onClick={() => { onReferenceFile(file.path) }}><IconLinkOutlineRegular /></button>
           </Tooltip>
         </div>)}</div>
       </details>)}</div>}
-    {selectedFile !== null && <Modal open onClose={() => { setSelectedFile(null) }} title={`${selectedFile.label}预览`} description={selectedFile.path} closeLabel="关闭预览" {...(css.previewModal === undefined ? {} : { className: css.previewModal })} {...(css.previewModalContent === undefined ? {} : { contentClassName: css.previewModalContent })} footer={<><Button variant="toolbar" icon={<IconLinkOutline16 />} onClick={() => { onReferenceFile(selectedFile.path); setSelectedFile(null) }}>引用到对话</Button><Button variant="toolbar" onClick={() => { setSelectedFile(null) }}>关闭</Button></>}>
+    {selectedFile !== null && <Modal open onClose={() => { setSelectedFile(null) }} title={`${selectedFile.label}预览`} description={selectedFile.path} closeLabel="关闭预览" {...(css.previewModal === undefined ? {} : { className: css.previewModal })} {...(css.previewModalContent === undefined ? {} : { contentClassName: css.previewModalContent })} footer={<><Button variant="toolbar" icon={<IconLinkOutlineRegular />} onClick={() => { onReferenceFile(selectedFile.path); setSelectedFile(null) }}>引用到对话</Button><Button variant="toolbar" onClick={() => { setSelectedFile(null) }}>关闭</Button></>}>
       <ArticlePreview file={selectedFile} preview={preview} sessionId={sessionId} />
     </Modal>}
   </main>

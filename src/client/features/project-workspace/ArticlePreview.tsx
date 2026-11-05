@@ -2,6 +2,7 @@ import type { ArticleFileSummary } from '../../../contracts/project.ts'
 import { articleFileUrl } from '../../project-snapshot.ts'
 import { MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
 import { filename } from './format.ts'
+import { previewMarkdownLabels } from '../../markdown-labels.ts'
 import css from '../../workbench.module.css'
 
 export type Preview = { readonly phase: 'idle' } | { readonly phase: 'loading' } | { readonly phase: 'ready'; readonly content: string } | { readonly phase: 'error'; readonly message: string }
@@ -36,5 +37,5 @@ export function ArticlePreview({ file, preview, sessionId }: { readonly file: Ar
   if (preview.phase === 'error') return <div className={css.operationError}>{preview.message}</div>
   if (preview.phase !== 'ready') return <div className={css.previewState}>文件尚未生成</div>
   if (file.kind === 'html') return <iframe className={css.htmlPreviewModalFrame} srcDoc={htmlForPreview(preview.content, file, sessionId)} title="公众号排版预览" sandbox="" />
-  return <article className={css.markdownPreviewModal}><MarkdownText text={markdownForPreview(preview.content)} /></article>
+  return <article className={css.markdownPreviewModal}><MarkdownText text={markdownForPreview(preview.content)} labels={previewMarkdownLabels} /></article>
 }

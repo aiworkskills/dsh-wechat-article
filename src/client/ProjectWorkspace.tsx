@@ -1,4 +1,4 @@
-import { Button, IconRefreshOutline16 } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, IconRefreshOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
 import { ArticleBrowser } from './features/project-workspace/ArticleBrowser.tsx'
 import { MaterialsBrowser } from './features/project-workspace/MaterialsBrowser.tsx'
 import { useProjectWorkspaceState } from './features/project-workspace/useProjectWorkspaceState.ts'
@@ -29,7 +29,7 @@ export function ProjectWorkspace({ view, sessionId, onReferenceFile }: Props) {
   } = useProjectWorkspaceState(sessionId, view)
 
   if (load.phase === 'loading') {
-    return <main className={css.checkingView}><span className={css.checkingIcon}><IconRefreshOutline16 /></span><span>正在读取公众号项目</span></main>
+    return <main className={css.checkingView}><span className={css.checkingIcon}><IconRefreshOutlineRegular /></span><span>正在读取公众号项目</span></main>
   }
   if (load.phase === 'error') {
     return <main className={css.content}><div className={css.operationError}>{load.message}</div><Button variant="toolbar" onClick={() => { void refresh() }}>重新读取</Button></main>

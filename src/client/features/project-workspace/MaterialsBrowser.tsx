@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import type { InputHTMLAttributes } from 'react'
-import { Button, IconBrowseOutline16, IconCheckOutline16, IconCloseOutline16, IconFolderClose16, IconFolderOpenOutline16, IconPaperclipOutline16, IconPlusOutline16, IconTrashOutline16, MarkdownText, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, IconBrowseOutlineRegular, IconCheckOutlineRegular, IconCloseOutlineRegular, IconFolderCloseRegular, IconFolderOpenOutlineRegular, IconPaperclipOutlineRegular, IconPlusOutlineRegular, IconTrashOutlineRegular, MarkdownText, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ProductDocumentSummary, ProductImageSummary, ProjectSnapshot } from '../../../contracts/project.ts'
 import { fetchProductDocument, productImageUrl } from '../../project-snapshot.ts'
+import { previewMarkdownLabels } from '../../markdown-labels.ts'
 import type { Preview } from './ArticlePreview.tsx'
 import { filename } from './format.ts'
 import { uploadsFromDrop, uploadsFromFiles } from './material-upload.ts'
@@ -62,8 +63,8 @@ function MaterialFile({ kind, item, sessionId, busy, onPreview, onRename, onDele
     {icon}
     <span className={css.materialFileRenameControls}>
       <input value={nextName} aria-label={`重命名 ${currentName}`} autoFocus onFocus={event => { event.currentTarget.select() }} onChange={event => { setNextName(event.target.value) }} />
-      <Tooltip label="确认重命名" side="top"><button className={css.compactIconButton} type="submit" aria-label={`确认重命名 ${currentName}`} disabled={busy || nextName.trim() === ''}><IconCheckOutline16 /></button></Tooltip>
-      <Tooltip label="取消" side="top"><button className={css.compactIconButton} type="button" aria-label={`取消重命名 ${currentName}`} onClick={() => { setRenaming(false); setNextName(currentName) }}><IconCloseOutline16 /></button></Tooltip>
+      <Tooltip label="确认重命名" side="top"><button className={css.compactIconButton} type="submit" aria-label={`确认重命名 ${currentName}`} disabled={busy || nextName.trim() === ''}><IconCheckOutlineRegular /></button></Tooltip>
+      <Tooltip label="取消" side="top"><button className={css.compactIconButton} type="button" aria-label={`取消重命名 ${currentName}`} onClick={() => { setRenaming(false); setNextName(currentName) }}><IconCloseOutlineRegular /></button></Tooltip>
     </span>
   </form>
 
@@ -75,7 +76,7 @@ function MaterialFile({ kind, item, sessionId, busy, onPreview, onRename, onDele
     <Tooltip label={`删除 ${currentName}`} side="top"><button className={css.materialFileDelete} type="button" aria-label={`删除 ${currentName}`} disabled={busy} onClick={() => {
       const detail = kind === 'image' ? '，对应的图片说明也会删除' : ''
       if (window.confirm(`确定删除“${currentName}”${detail}？`)) onDelete()
-    }}><IconTrashOutline16 /></button></Tooltip>
+    }}><IconTrashOutlineRegular /></button></Tooltip>
   </div>
 }
 
@@ -122,12 +123,12 @@ function MaterialFolder({ category, documents, images, sessionId, busy, onUpload
     onDragOver={event => { if (event.dataTransfer.types.includes('Files')) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy' } }}
     onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false) }}
     onDrop={event => { event.preventDefault(); setDragging(false); readDrop(event.dataTransfer) }}>
-    <summary className={css.materialGroupHeader}><span className={css.materialFolderIdentity}><span className={css.closedFolderIcon}><IconFolderClose16 /></span><span className={css.openFolderIcon}><IconFolderOpenOutline16 /></span>{renaming
-      ? <form className={css.renameCategoryRow} onClick={stopBubbling} onSubmit={event => { event.preventDefault(); event.stopPropagation(); submitRename() }}><input value={nextName} aria-label={`重命名 ${category}`} autoFocus onFocus={event => { event.currentTarget.select() }} onChange={event => { setNextName(event.target.value) }} /><Tooltip label="确认重命名" side="top"><button className={css.compactIconButton} type="submit" aria-label="确认重命名" disabled={busy || nextName.trim() === ''}><IconCheckOutline16 /></button></Tooltip><Tooltip label="取消" side="top"><button className={css.compactIconButton} type="button" aria-label="取消重命名" onClick={() => { setRenaming(false); setNextName(category) }}><IconCloseOutline16 /></button></Tooltip></form>
+    <summary className={css.materialGroupHeader}><span className={css.materialFolderIdentity}><span className={css.closedFolderIcon}><IconFolderCloseRegular /></span><span className={css.openFolderIcon}><IconFolderOpenOutlineRegular /></span>{renaming
+      ? <form className={css.renameCategoryRow} onClick={stopBubbling} onSubmit={event => { event.preventDefault(); event.stopPropagation(); submitRename() }}><input value={nextName} aria-label={`重命名 ${category}`} autoFocus onFocus={event => { event.currentTarget.select() }} onChange={event => { setNextName(event.target.value) }} /><Tooltip label="确认重命名" side="top"><button className={css.compactIconButton} type="submit" aria-label="确认重命名" disabled={busy || nextName.trim() === ''}><IconCheckOutlineRegular /></button></Tooltip><Tooltip label="取消" side="top"><button className={css.compactIconButton} type="button" aria-label="取消重命名" onClick={() => { setRenaming(false); setNextName(category) }}><IconCloseOutlineRegular /></button></Tooltip></form>
       : <span className={css.materialFolderName} onClick={stopSummary} onDoubleClick={beginRename} title="双击重命名"><strong>{category}</strong><small>{documents.length} 文档 · {images.length} 图片</small></span>}</span>{!renaming && <span className={css.sectionActions} onClick={stopSummary}>
-      <Tooltip label={`向 ${category} 添加文档`} side="top"><button className={css.compactIconButton} type="button" aria-label={`向 ${category} 添加文档`} disabled={busy} onClick={() => { documentInput.current?.click() }}><IconPaperclipOutline16 /></button></Tooltip>
-      <Tooltip label={`向 ${category} 添加图片`} side="top"><button className={css.compactIconButton} type="button" aria-label={`向 ${category} 添加图片`} disabled={busy} onClick={() => { imageInput.current?.click() }}><IconBrowseOutline16 /></button></Tooltip>
-      <Tooltip label={`向 ${category} 导入文件夹`} side="top"><button className={css.compactIconButton} type="button" aria-label={`向 ${category} 导入文件夹`} disabled={busy} onClick={() => { folderInput.current?.click() }}><IconFolderOpenOutline16 /></button></Tooltip>
+      <Tooltip label={`向 ${category} 添加文档`} side="top"><button className={css.compactIconButton} type="button" aria-label={`向 ${category} 添加文档`} disabled={busy} onClick={() => { documentInput.current?.click() }}><IconPaperclipOutlineRegular /></button></Tooltip>
+      <Tooltip label={`向 ${category} 添加图片`} side="top"><button className={css.compactIconButton} type="button" aria-label={`向 ${category} 添加图片`} disabled={busy} onClick={() => { imageInput.current?.click() }}><IconBrowseOutlineRegular /></button></Tooltip>
+      <Tooltip label={`向 ${category} 导入文件夹`} side="top"><button className={css.compactIconButton} type="button" aria-label={`向 ${category} 导入文件夹`} disabled={busy} onClick={() => { folderInput.current?.click() }}><IconFolderOpenOutlineRegular /></button></Tooltip>
     </span>}</summary>
     <input ref={documentInput} className={css.hiddenFileInput} type="file" accept=".md,.txt,text/markdown,text/plain" multiple onChange={event => { onUpload(category, uploadsFromFiles(event.target.files ?? [])); event.target.value = '' }} />
     <input ref={imageInput} className={css.hiddenFileInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple onChange={event => { onUpload(category, uploadsFromFiles(event.target.files ?? [])); event.target.value = '' }} />
@@ -180,8 +181,8 @@ export function MaterialsBrowser({ snapshot, sessionId, busy, error, onCreateCat
     setCreating(false)
   }
   return <main className={css.content}>
-    <section className={css.sectionHeading}><div><h2>写作素材</h2><p>按内容方向整理文档与图片</p></div><Tooltip label="添加内容方向" side="bottom"><button className={css.compactIconButton} type="button" aria-label="添加内容方向" disabled={busy} onClick={() => { setCreating(true) }}><IconPlusOutline16 /></button></Tooltip></section>
-    {creating && <form className={css.newCategoryRow} onSubmit={event => { event.preventDefault(); submitCategory() }}><IconFolderClose16 /><input value={categoryName} placeholder="添加一个全新的内容方向" aria-label="添加一个全新的内容方向" autoFocus onChange={event => { setCategoryName(event.target.value) }} /><Tooltip label="创建文件夹" side="top"><button className={css.compactIconButton} type="submit" aria-label="创建文件夹" disabled={busy || categoryName.trim() === ''}><IconCheckOutline16 /></button></Tooltip><Tooltip label="取消" side="top"><button className={css.compactIconButton} type="button" aria-label="取消添加内容方向" onClick={() => { setCreating(false); setCategoryName('') }}><IconCloseOutline16 /></button></Tooltip></form>}
+    <section className={css.sectionHeading}><div><h2>写作素材</h2><p>按内容方向整理文档与图片</p></div><Tooltip label="添加内容方向" side="bottom"><button className={css.compactIconButton} type="button" aria-label="添加内容方向" disabled={busy} onClick={() => { setCreating(true) }}><IconPlusOutlineRegular /></button></Tooltip></section>
+    {creating && <form className={css.newCategoryRow} onSubmit={event => { event.preventDefault(); submitCategory() }}><IconFolderCloseRegular /><input value={categoryName} placeholder="添加一个全新的内容方向" aria-label="添加一个全新的内容方向" autoFocus onChange={event => { setCategoryName(event.target.value) }} /><Tooltip label="创建文件夹" side="top"><button className={css.compactIconButton} type="submit" aria-label="创建文件夹" disabled={busy || categoryName.trim() === ''}><IconCheckOutlineRegular /></button></Tooltip><Tooltip label="取消" side="top"><button className={css.compactIconButton} type="button" aria-label="取消添加内容方向" onClick={() => { setCreating(false); setCategoryName('') }}><IconCloseOutlineRegular /></button></Tooltip></form>}
     {error !== '' && <div className={css.operationError} role="alert">{error}</div>}
     {busy && <div className={css.materialStatus}>正在处理素材</div>}
     {snapshot.products.length === 0 ? <Empty>还没有写作素材。请先添加一个内容方向。</Empty> : <div className={css.materialGroups}>{snapshot.products.map(category => {
@@ -190,7 +191,7 @@ export function MaterialsBrowser({ snapshot, sessionId, busy, error, onCreateCat
       return <MaterialFolder category={category.name} documents={documents} images={images} sessionId={sessionId} busy={busy} onUpload={onUploadFiles} onRename={onRenameCategory} onRenameDocument={onRenameDocument} onRenameImage={onRenameImage} onDeleteDocument={onDeleteDocument} onDeleteImage={onDeleteImage} onPreview={setMaterialPreview} key={category.name} />
     })}</div>}
     {materialPreview?.kind === 'document' && <Modal open onClose={() => { setMaterialPreview(null) }} title={materialPreview.item.title} description={materialPreview.item.path} closeLabel="关闭预览" {...(css.previewModal === undefined ? {} : { className: css.previewModal })} {...(css.previewModalContent === undefined ? {} : { contentClassName: css.previewModalContent })} footer={<Button variant="toolbar" onClick={() => { setMaterialPreview(null) }}>关闭</Button>}>
-      {documentPreview.phase === 'loading' ? <div className={css.previewState}>正在读取文档</div> : documentPreview.phase === 'error' ? <div className={css.operationError}>{documentPreview.message}</div> : documentPreview.phase === 'ready' ? <article className={css.markdownPreviewModal}><MarkdownText text={documentPreview.content} /></article> : null}
+      {documentPreview.phase === 'loading' ? <div className={css.previewState}>正在读取文档</div> : documentPreview.phase === 'error' ? <div className={css.operationError}>{documentPreview.message}</div> : documentPreview.phase === 'ready' ? <article className={css.markdownPreviewModal}><MarkdownText text={documentPreview.content} labels={previewMarkdownLabels} /></article> : null}
     </Modal>}
     {materialPreview?.kind === 'image' && <Modal open onClose={() => { setMaterialPreview(null) }} title={filename(materialPreview.item.path)} description={materialPreview.item.product} closeLabel="关闭预览" {...(css.previewModal === undefined ? {} : { className: css.previewModal })} {...(css.previewModalContent === undefined ? {} : { contentClassName: css.previewModalContent })} footer={<Button variant="toolbar" onClick={() => { setMaterialPreview(null) }}>关闭</Button>}><figure className={css.materialImagePreview}><img src={productImageUrl(sessionId, materialPreview.item.path)} alt={materialPreview.item.description || filename(materialPreview.item.path)} /><figcaption>{materialPreview.item.description || '缺少图片说明'}</figcaption></figure></Modal>}
   </main>
