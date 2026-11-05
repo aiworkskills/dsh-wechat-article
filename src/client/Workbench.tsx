@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
-  IconCheckOutline16,
-  IconCloseOutline16,
-  IconDownloadOutline16,
-  IconRefreshOutline16,
-  IconSettingsOutline16,
-  IconSkillOutline16,
+  IconCheckOutlineRegular,
+  IconCloseOutlineRegular,
+  IconDownloadOutlineRegular,
+  IconRefreshOutlineRegular,
+  IconSettingsOutlineRegular,
+  IconSkillOutlineRegular,
   Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -164,7 +164,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
       onFocus={() => { onMenuOpenChange(true) }}
       onClick={() => { onMenuOpenChange(false); setSection('config') }}
     >
-      <IconSettingsOutline16 size={12} />
+      <IconSettingsOutlineRegular size={12} />
       <span>技能配置</span>
     </button>
   )
@@ -174,7 +174,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
       <div className={css.toolbar}>
         <div className={css.toolbarTop}>
           <div className={css.titleGroup}>
-            <IconSkillOutline16 />
+            <IconSkillOutlineRegular />
             <strong>公众号</strong>
           </div>
           <div className={css.drawerActions}>
@@ -187,7 +187,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
                   disabled={skillMutation !== null}
                   onClick={() => { void synchronizeSkills('updating') }}
                 >
-                  <IconRefreshOutline16 size={12} />
+                  <IconRefreshOutlineRegular size={12} />
                   <span>{skillMutation === 'updating' ? '更新中' : '更新 Skill'}</span>
                 </button>
               </Tooltip>
@@ -202,7 +202,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
             )}
             <Tooltip label="关闭公众号工作台" side="bottom">
               <button className={css.iconButton} type="button" aria-label="关闭公众号工作台" onClick={onClose}>
-                <IconCloseOutline16 size={12} className={css.toolbarGlyph} />
+                <IconCloseOutlineRegular size={12} className={css.toolbarGlyph} />
               </button>
             </Tooltip>
           </div>
@@ -232,7 +232,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
         {section === 'install' && (
           <main className={css.installView}>
             <span className={skillsInstalled ? css.installIconReady : css.installIcon}>
-              {skillsInstalled ? <IconCheckOutline16 size={22} /> : <IconDownloadOutline16 size={22} />}
+              {skillsInstalled ? <IconCheckOutlineRegular size={22} /> : <IconDownloadOutlineRegular size={22} />}
             </span>
             <div className={css.installCopy}>
               <h2>{skillsInstalled ? '公众号 Skill 已安装' : skillSourcePresent ? '更新公众号 Skill' : '安装公众号运营Skill'}</h2>
@@ -248,7 +248,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
               {!skillsInstalled && (
                 <Button
                   variant="primary"
-                  icon={<IconDownloadOutline16 />}
+                  icon={<IconDownloadOutlineRegular />}
                   disabled={skillSource.phase === 'loading' || skillMutation !== null}
                   onClick={() => { void synchronizeSkills(skillSourcePresent ? 'updating' : 'installing') }}
                 >
@@ -269,7 +269,7 @@ export function Workbench({ sessionId, useInput, useSessions, inputActions, onCl
         )}
         {section === 'checking' && (
           <main className={css.checkingView}>
-            <span className={css.checkingIcon}><IconRefreshOutline16 /></span>
+            <span className={css.checkingIcon}><IconRefreshOutlineRegular /></span>
             <span>正在检查项目配置</span>
           </main>
         )}

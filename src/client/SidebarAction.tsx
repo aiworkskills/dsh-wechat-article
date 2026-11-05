@@ -1,5 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
-import { IconSkillOutline16, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
+import { IconSkillOutlineRegular, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type { WorkbenchPanelController } from './panel-controller.ts'
@@ -38,7 +38,7 @@ export function SidebarAction({ wide, useSessions, panel, label }: SidebarAction
           disabled={!available}
           onClick={panel.toggle}
         >
-          <IconSkillOutline16 size={wide ? 16 : 18} />
+          <IconSkillOutlineRegular size={wide ? 16 : 18} />
           {wide && <span>{name}</span>}
         </button>
       </Tooltip>

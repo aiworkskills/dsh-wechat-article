@@ -1,17 +1,17 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import {
-  IconFolderOpenOutline16,
-  IconLinkOutline14,
-  IconSettingsOutline16,
+  IconFolderOpenOutlineRegular,
+  IconLinkOutlineRegular,
+  IconSettingsOutlineRegular,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import css from '../../workbench.module.css'
 
 export type ConfigurationMenuAction = 'embed' | 'website' | 'manual'
 
 const ITEMS: ReadonlyArray<{ readonly id: ConfigurationMenuAction; readonly label: string; readonly icon: ReactNode }> = [
-  { id: 'embed', label: '在线配置', icon: <IconSettingsOutline16 size={12} className={css.configurationMenuIcon} /> },
-  { id: 'website', label: '去网站配置', icon: <IconLinkOutline14 size={12} className={css.configurationMenuIcon} /> },
-  { id: 'manual', label: '手动配置', icon: <IconFolderOpenOutline16 size={12} className={css.configurationMenuIcon} /> },
+  { id: 'embed', label: '在线配置', icon: <IconSettingsOutlineRegular size={12} className={css.configurationMenuIcon} /> },
+  { id: 'website', label: '去网站配置', icon: <IconLinkOutlineRegular size={12} className={css.configurationMenuIcon} /> },
+  { id: 'manual', label: '手动配置', icon: <IconFolderOpenOutlineRegular size={12} className={css.configurationMenuIcon} /> },
 ]
 
 export function ConfigurationMenu({
